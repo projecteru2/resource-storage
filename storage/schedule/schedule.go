@@ -8,9 +8,9 @@ import (
 	"github.com/cockroachdb/errors"
 
 	"github.com/projecteru2/core/log"
-	"github.com/projecteru2/core/resource3/plugins/storage/types"
 	coretypes "github.com/projecteru2/core/types"
 	"github.com/projecteru2/core/utils"
+	"github.com/projecteru2/resource-storage/storage/types"
 )
 
 type volume struct {

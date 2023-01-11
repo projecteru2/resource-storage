@@ -1,4 +1,4 @@
-module github/projecteru2/resource-storage
+module github.com/projecteru2/resource-storage
 
 go 1.19
 

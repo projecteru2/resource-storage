@@ -3,9 +3,10 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"github/projecteru2/resource-storage/storage"
 	"os"
 	"testing"
+
+	"github.com/projecteru2/resource-storage/storage"
 
 	"github.com/projecteru2/core/types"
 	"github.com/projecteru2/core/utils"

@@ -1,8 +1,8 @@
 package metrics
 
 import (
-	"github/projecteru2/resource-storage/cmd"
-	"github/projecteru2/resource-storage/storage"
+	"github.com/projecteru2/resource-storage/cmd"
+	"github.com/projecteru2/resource-storage/storage"
 
 	"github.com/projecteru2/core/resource3/plugins/binary"
 	"github.com/projecteru2/core/types"

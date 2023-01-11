@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github/projecteru2/resource-storage/cmd"
-	"github/projecteru2/resource-storage/cmd/metrics"
-	"github/projecteru2/resource-storage/cmd/node"
-	"github/projecteru2/resource-storage/cmd/storage"
-	"github/projecteru2/resource-storage/version"
+	"github.com/projecteru2/resource-storage/cmd"
+	"github.com/projecteru2/resource-storage/cmd/metrics"
+	"github.com/projecteru2/resource-storage/cmd/node"
+	"github.com/projecteru2/resource-storage/cmd/storage"
+	"github.com/projecteru2/resource-storage/version"
 
 	"github.com/urfave/cli/v2"
 )

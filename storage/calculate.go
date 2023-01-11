@@ -3,11 +3,12 @@ package storage
 import (
 	"context"
 
+	"github.com/projecteru2/resource-storage/storage/schedule"
+	storagetypes "github.com/projecteru2/resource-storage/storage/types"
+
 	"github.com/cockroachdb/errors"
 	"github.com/mitchellh/mapstructure"
 	"github.com/projecteru2/core/log"
-	"github.com/projecteru2/core/resource3/plugins/storage/schedule"
-	storagetypes "github.com/projecteru2/core/resource3/plugins/storage/types"
 	plugintypes "github.com/projecteru2/core/resource3/plugins/types"
 	coretypes "github.com/projecteru2/core/types"
 	"github.com/projecteru2/core/utils"

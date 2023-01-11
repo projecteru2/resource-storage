@@ -3,7 +3,7 @@ package storage
 import (
 	"fmt"
 
-	"github.com/projecteru2/core/resource3/plugins/storage/types"
+	"github.com/projecteru2/resource-storage/storage/types"
 )
 
 func (p Plugin) toIOPSOptions(disks types.Disks) map[string]string {

@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/projecteru2/resource-storage/storage/schedule"
+	storagetypes "github.com/projecteru2/resource-storage/storage/types"
+
 	"github.com/cockroachdb/errors"
 	"github.com/mitchellh/mapstructure"
 	enginetypes "github.com/projecteru2/core/engine/types"
 	"github.com/projecteru2/core/log"
-	"github.com/projecteru2/core/resource3/plugins/storage/schedule"
-	"github.com/projecteru2/core/resource3/plugins/storage/types"
-	storagetypes "github.com/projecteru2/core/resource3/plugins/storage/types"
 	plugintypes "github.com/projecteru2/core/resource3/plugins/types"
 	coretypes "github.com/projecteru2/core/types"
 	"github.com/projecteru2/core/utils"
@@ -139,7 +139,7 @@ func (p Plugin) SetNodeResourceCapacity(ctx context.Context, nodename string, re
 			for _, rmDisk := range req.RMDisks {
 				rmDisksMap[rmDisk] = struct{}{}
 			}
-			nodeResourceInfo.Capacity.Disks = utils.Filter(nodeResourceInfo.Capacity.Disks, func(d *types.Disk) bool {
+			nodeResourceInfo.Capacity.Disks = utils.Filter(nodeResourceInfo.Capacity.Disks, func(d *storagetypes.Disk) bool {
 				_, ok := rmDisksMap[d.Device]
 				return !ok
 			})

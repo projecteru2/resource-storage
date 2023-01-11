@@ -1,8 +1,8 @@
 package node
 
 import (
-	"github/projecteru2/resource-storage/cmd"
-	"github/projecteru2/resource-storage/storage"
+	"github.com/projecteru2/resource-storage/cmd"
+	"github.com/projecteru2/resource-storage/storage"
 
 	"github.com/mitchellh/mapstructure"
 	enginetypes "github.com/projecteru2/core/engine/types"
