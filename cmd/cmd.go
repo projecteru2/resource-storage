@@ -16,7 +16,7 @@ var (
 func Serve(c *cli.Context, f func(s *storage.Plugin) error) error {
 	config, err := utils.LoadConfig(ConfigPath)
 	if err != nil {
-		return err
+		return cli.Exit(err, 128)
 	}
 
 	var t *testing.T
@@ -26,7 +26,10 @@ func Serve(c *cli.Context, f func(s *storage.Plugin) error) error {
 
 	s, err := storage.NewPlugin(c.Context, config, t)
 	if err != nil {
-		return err
+		return cli.Exit(err, 128)
 	}
-	return f(s)
+	if err := f(s); err != nil {
+		return cli.Exit(err, 128)
+	}
+	return nil
 }
