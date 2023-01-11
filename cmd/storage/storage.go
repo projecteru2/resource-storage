@@ -1,23 +1,24 @@
 package storage
 
 import (
+	"fmt"
 	"github/projecteru2/resource-storage/cmd"
+	"github/projecteru2/resource-storage/storage"
 
-	"github.com/projecteru2/core/resource3/plugins"
-	cli "github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v2"
 )
 
 func Command() *cli.Command {
 	return &cli.Command{
 		Name:   "name",
 		Usage:  "show name",
-		Action: name,
+		Action: serve,
 	}
 }
 
-func name(c *cli.Context) error {
-	return cmd.Serve(c, func(p plugins.Plugin) error {
-		print(`{"name": "` + p.Name() + `"}`)
+func serve(c *cli.Context) error {
+	return cmd.Serve(c, func(s *storage.Plugin) error {
+		fmt.Print(s.Name())
 		return nil
 	})
 }

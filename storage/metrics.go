@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -10,9 +11,8 @@ import (
 )
 
 // GetMetricsDescription .
-func (p Plugin) GetMetricsDescription(ctx context.Context) (*plugintypes.GetMetricsDescriptionResponse, error) {
-	resp := &plugintypes.GetMetricsDescriptionResponse{}
-	return resp, mapstructure.Decode([]map[string]interface{}{
+func (p Plugin) GetMetricsDescription(ctx context.Context) ([]byte, error) {
+	return json.Marshal([]map[string]interface{}{
 		{
 			"name":   "storage_used",
 			"help":   "node used storage.",
@@ -25,7 +25,7 @@ func (p Plugin) GetMetricsDescription(ctx context.Context) (*plugintypes.GetMetr
 			"type":   "gauge",
 			"labels": []string{"podname", "nodename"},
 		},
-	}, resp)
+	})
 }
 
 // GetMetrics .

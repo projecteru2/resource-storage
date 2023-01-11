@@ -4,9 +4,8 @@ import (
 	"github/projecteru2/resource-storage/storage"
 	"testing"
 
-	"github.com/projecteru2/core/resource3/plugins"
 	"github.com/projecteru2/core/utils"
-	cli "github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v2"
 )
 
 var (
@@ -14,7 +13,7 @@ var (
 	EmbeddedStorage bool
 )
 
-func Serve(c *cli.Context, f func(p plugins.Plugin) error) error {
+func Serve(c *cli.Context, f func(s *storage.Plugin) error) error {
 	config, err := utils.LoadConfig(ConfigPath)
 	if err != nil {
 		return err
@@ -25,9 +24,9 @@ func Serve(c *cli.Context, f func(p plugins.Plugin) error) error {
 		t = &testing.T{}
 	}
 
-	plugin, err := storage.NewPlugin(c.Context, config, t)
+	s, err := storage.NewPlugin(c.Context, config, t)
 	if err != nil {
 		return err
 	}
-	return f(plugin)
+	return f(s)
 }

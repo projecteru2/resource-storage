@@ -36,5 +36,5 @@ func NewPlugin(ctx context.Context, config coretypes.Config, t *testing.T) (*Plu
 }
 
 func (p Plugin) Name() string {
-	return p.name
+	return `{"name": "` + p.name + `"}`
 }

@@ -5,10 +5,11 @@ import (
 	"os"
 
 	"github/projecteru2/resource-storage/cmd"
+	"github/projecteru2/resource-storage/cmd/metrics"
 	"github/projecteru2/resource-storage/cmd/storage"
 	"github/projecteru2/resource-storage/version"
 
-	cli "github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v2"
 )
 
 func main() {
@@ -22,6 +23,7 @@ func main() {
 	app.Version = version.VERSION
 	app.Commands = []*cli.Command{
 		storage.Command(),
+		metrics.DescriptionCommand(),
 	}
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
