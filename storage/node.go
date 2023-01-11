@@ -57,12 +57,12 @@ func (p Plugin) AddNode(ctx context.Context, nodename string, resource *pluginty
 	}, resp)
 }
 
-func (p Plugin) RemoveNode(ctx context.Context, nodename string) (*plugintypes.RemoveNodeResponse, error) {
+func (p Plugin) RemoveNode(ctx context.Context, nodename string) error {
 	if _, err := p.store.Delete(ctx, fmt.Sprintf(nodeResourceInfoKey, nodename)); err != nil {
 		log.WithFunc("resource.storage.RemoveNode").WithField("node", nodename).Error(ctx, err, "faield to delete node")
-		return nil, err
+		return err
 	}
-	return &plugintypes.RemoveNodeResponse{}, nil
+	return nil
 }
 
 func (p Plugin) GetNodesDeployCapacity(ctx context.Context, nodenames []string, resource *plugintypes.WorkloadResourceRequest) (*plugintypes.GetNodesDeployCapacityResponse, error) {

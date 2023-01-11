@@ -6,6 +6,7 @@ import (
 
 	"github/projecteru2/resource-storage/cmd"
 	"github/projecteru2/resource-storage/cmd/metrics"
+	"github/projecteru2/resource-storage/cmd/node"
 	"github/projecteru2/resource-storage/cmd/storage"
 	"github/projecteru2/resource-storage/version"
 
@@ -25,6 +26,8 @@ func main() {
 		storage.Command(),
 		metrics.DescriptionCommand(),
 		metrics.GetMetricsCommand(),
+		node.AddNodeCommand(),
+		node.RemoveNodeCommand(),
 	}
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{

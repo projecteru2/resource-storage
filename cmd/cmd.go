@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"encoding/json"
 	"github/projecteru2/resource-storage/storage"
+	"os"
 	"testing"
 
+	"github.com/projecteru2/core/types"
 	"github.com/projecteru2/core/utils"
 	"github.com/urfave/cli/v2"
 )
@@ -13,7 +16,7 @@ var (
 	EmbeddedStorage bool
 )
 
-func Serve(c *cli.Context, f func(s *storage.Plugin) error) error {
+func Serve(c *cli.Context, f func(s *storage.Plugin, in *types.RawParams) error) error {
 	config, err := utils.LoadConfig(ConfigPath)
 	if err != nil {
 		return cli.Exit(err, 128)
@@ -28,7 +31,13 @@ func Serve(c *cli.Context, f func(s *storage.Plugin) error) error {
 	if err != nil {
 		return cli.Exit(err, 128)
 	}
-	if err := f(s); err != nil {
+
+	in := &types.RawParams{}
+	if err := json.NewDecoder(os.Stdin).Decode(in); err != nil {
+		return cli.Exit(err, 128)
+	}
+
+	if err := f(s, in); err != nil {
 		return cli.Exit(err, 128)
 	}
 	return nil

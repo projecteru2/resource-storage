@@ -1,13 +1,12 @@
 package metrics
 
 import (
-	"encoding/json"
 	"fmt"
 	"github/projecteru2/resource-storage/cmd"
 	"github/projecteru2/resource-storage/storage"
-	"os"
 
 	"github.com/projecteru2/core/resource3/plugins/binary"
+	"github.com/projecteru2/core/types"
 	"github.com/urfave/cli/v2"
 )
 
@@ -20,12 +19,10 @@ func GetMetricsCommand() *cli.Command {
 }
 
 func metric(c *cli.Context) error {
-	return cmd.Serve(c, func(s *storage.Plugin) error {
-		req := map[string]string{}
-		if err := json.NewDecoder(os.Stdin).Decode(&req); err != nil {
-			return err
-		}
-		r, err := s.GetMetrics(c.Context, req["podname"], req["nodename"])
+	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) error {
+		podname := in.String("podname")
+		nodename := in.String("nodename")
+		r, err := s.GetMetrics(c.Context, podname, nodename)
 		if err != nil {
 			return err
 		}
