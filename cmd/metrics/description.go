@@ -13,11 +13,11 @@ func DescriptionCommand() *cli.Command {
 	return &cli.Command{
 		Name:   binary.GetMetricsDescriptionCommand,
 		Usage:  "show metrics descriptions",
-		Action: serve,
+		Action: description,
 	}
 }
 
-func serve(c *cli.Context) error {
+func description(c *cli.Context) error {
 	return cmd.Serve(c, func(s *storage.Plugin) error {
 		r, err := s.GetMetricsDescription(c.Context)
 		if err != nil {

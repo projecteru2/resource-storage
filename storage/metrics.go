@@ -5,9 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-
-	"github.com/mitchellh/mapstructure"
-	plugintypes "github.com/projecteru2/core/resource3/plugins/types"
 )
 
 // GetMetricsDescription .
@@ -29,7 +26,7 @@ func (p Plugin) GetMetricsDescription(ctx context.Context) ([]byte, error) {
 }
 
 // GetMetrics .
-func (p Plugin) GetMetrics(ctx context.Context, podname, nodename string) (*plugintypes.GetMetricsResponse, error) {
+func (p Plugin) GetMetrics(ctx context.Context, podname, nodename string) ([]byte, error) {
 	nodeResourceInfo, err := p.doGetNodeResourceInfo(ctx, nodename)
 	if err != nil {
 		return nil, err
@@ -50,6 +47,5 @@ func (p Plugin) GetMetrics(ctx context.Context, podname, nodename string) (*plug
 		},
 	}
 
-	resp := &plugintypes.GetMetricsResponse{}
-	return resp, mapstructure.Decode(metrics, resp)
+	return json.Marshal(metrics)
 }

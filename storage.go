@@ -24,6 +24,7 @@ func main() {
 	app.Commands = []*cli.Command{
 		storage.Command(),
 		metrics.DescriptionCommand(),
+		metrics.GetMetricsCommand(),
 	}
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
