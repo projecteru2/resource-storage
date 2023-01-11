@@ -2,14 +2,15 @@ package storage
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
+
+	"github.com/projecteru2/core/types"
 )
 
 // GetMetricsDescription .
-func (p Plugin) GetMetricsDescription(ctx context.Context) ([]byte, error) {
-	return json.Marshal([]map[string]interface{}{
+func (p Plugin) GetMetricsDescription(ctx context.Context) ([]*types.RawParams, error) {
+	return []*types.RawParams{
 		{
 			"name":   "storage_used",
 			"help":   "node used storage.",
@@ -22,17 +23,17 @@ func (p Plugin) GetMetricsDescription(ctx context.Context) ([]byte, error) {
 			"type":   "gauge",
 			"labels": []string{"podname", "nodename"},
 		},
-	})
+	}, nil
 }
 
 // GetMetrics .
-func (p Plugin) GetMetrics(ctx context.Context, podname, nodename string) ([]byte, error) {
+func (p Plugin) GetMetrics(ctx context.Context, podname, nodename string) ([]*types.RawParams, error) {
 	nodeResourceInfo, err := p.doGetNodeResourceInfo(ctx, nodename)
 	if err != nil {
 		return nil, err
 	}
 	safeNodename := strings.ReplaceAll(nodename, ".", "_")
-	metrics := []map[string]interface{}{
+	return []*types.RawParams{
 		{
 			"name":   "storage_used",
 			"labels": []string{podname, nodename},
@@ -45,7 +46,5 @@ func (p Plugin) GetMetrics(ctx context.Context, podname, nodename string) ([]byt
 			"value":  fmt.Sprintf("%+v", nodeResourceInfo.Capacity.Storage),
 			"key":    fmt.Sprintf("core.node.%s.storage.used", safeNodename),
 		},
-	}
-
-	return json.Marshal(metrics)
+	}, nil
 }

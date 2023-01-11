@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 	"github/projecteru2/resource-storage/storage"
 	"os"
 	"testing"
@@ -16,7 +17,7 @@ var (
 	EmbeddedStorage bool
 )
 
-func Serve(c *cli.Context, f func(s *storage.Plugin, in *types.RawParams) error) error {
+func Serve(c *cli.Context, f func(s *storage.Plugin, in *types.RawParams) (interface{}, error)) error {
 	config, err := utils.LoadConfig(ConfigPath)
 	if err != nil {
 		return cli.Exit(err, 128)
@@ -37,8 +38,12 @@ func Serve(c *cli.Context, f func(s *storage.Plugin, in *types.RawParams) error)
 		return cli.Exit(err, 128)
 	}
 
-	if err := f(s, in); err != nil {
+	if r, err := f(s, in); err != nil {
 		return cli.Exit(err, 128)
+	} else if o, err := json.Marshal(r); err != nil {
+		return cli.Exit(err, 128)
+	} else {
+		fmt.Print(string(o))
 	}
 	return nil
 }

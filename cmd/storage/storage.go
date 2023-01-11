@@ -18,8 +18,8 @@ func Command() *cli.Command {
 }
 
 func serve(c *cli.Context) error {
-	return cmd.Serve(c, func(s *storage.Plugin, _ *types.RawParams) error {
+	return cmd.Serve(c, func(s *storage.Plugin, _ *types.RawParams) (interface{}, error) {
 		fmt.Print(s.Name())
-		return nil
+		return nil, nil
 	})
 }

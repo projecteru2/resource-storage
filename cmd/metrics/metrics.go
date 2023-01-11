@@ -1,7 +1,6 @@
 package metrics
 
 import (
-	"fmt"
 	"github/projecteru2/resource-storage/cmd"
 	"github/projecteru2/resource-storage/storage"
 
@@ -19,14 +18,9 @@ func GetMetricsCommand() *cli.Command {
 }
 
 func metric(c *cli.Context) error {
-	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) error {
+	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
 		podname := in.String("podname")
 		nodename := in.String("nodename")
-		r, err := s.GetMetrics(c.Context, podname, nodename)
-		if err != nil {
-			return err
-		}
-		fmt.Print(string(r))
-		return nil
+		return s.GetMetrics(c.Context, podname, nodename)
 	})
 }

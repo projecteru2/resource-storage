@@ -4,6 +4,8 @@ import (
 	"github/projecteru2/resource-storage/cmd"
 	"github/projecteru2/resource-storage/storage"
 
+	"github.com/mitchellh/mapstructure"
+	enginetypes "github.com/projecteru2/core/engine/types"
 	"github.com/projecteru2/core/resource3/plugins/binary"
 	"github.com/projecteru2/core/types"
 	"github.com/urfave/cli/v2"
@@ -26,17 +28,28 @@ func RemoveNodeCommand() *cli.Command {
 }
 
 func addNode(c *cli.Context) error {
-	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) error {
-		return nil
+	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
+		nodename := in.String("nodename")
+		if nodename == "" {
+			return nil, types.ErrEmptyNodeName
+		}
+		engineInfo := in.RawParams("info")
+		resource := in.RawParams("resource")
+		info := &enginetypes.Info{}
+		if err := mapstructure.Decode(engineInfo, info); err != nil {
+			return nil, err
+		}
+		return s.AddNode(c.Context, nodename, resource, info)
+
 	})
 }
 
 func removeNode(c *cli.Context) error {
-	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) error {
+	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
 		nodename := in.String("nodename")
 		if nodename == "" {
-			return types.ErrEmptyNodeName
+			return nil, types.ErrEmptyNodeName
 		}
-		return s.RemoveNode(c.Context, nodename)
+		return nil, s.RemoveNode(c.Context, nodename)
 	})
 }

@@ -19,7 +19,7 @@ import (
 	"github.com/sanity-io/litter"
 )
 
-func (p Plugin) AddNode(ctx context.Context, nodename string, resource *plugintypes.NodeResourceRequest, info *enginetypes.Info) (*plugintypes.AddNodeResponse, error) {
+func (p Plugin) AddNode(ctx context.Context, nodename string, resource *plugintypes.NodeResourceRequest, info *enginetypes.Info) (*coretypes.RawParams, error) {
 	// try to get the node resource
 	var err error
 	if _, err = p.doGetNodeResourceInfo(ctx, nodename); err == nil {
@@ -47,14 +47,16 @@ func (p Plugin) AddNode(ctx context.Context, nodename string, resource *pluginty
 			Storage: req.Storage,
 			Disks:   req.Disks,
 		},
-		Usage: nil,
 	}
 
-	resp := &plugintypes.AddNodeResponse{}
-	return resp, mapstructure.Decode(map[string]interface{}{
+	if err = p.doSetNodeResourceInfo(ctx, nodename, nodeResourceInfo); err != nil {
+		return nil, err
+	}
+
+	return &coretypes.RawParams{
 		"capacity": nodeResourceInfo.Capacity,
 		"usage":    nodeResourceInfo.Usage,
-	}, resp)
+	}, nil
 }
 
 func (p Plugin) RemoveNode(ctx context.Context, nodename string) error {
