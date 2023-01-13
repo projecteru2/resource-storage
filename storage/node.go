@@ -160,15 +160,18 @@ func (p Plugin) GetNodeResourceInfo(ctx context.Context, nodename string, worklo
 	}, nil
 }
 
-func (p Plugin) SetNodeResourceInfo(ctx context.Context, nodename string, capacity *plugintypes.NodeResource, usage *plugintypes.NodeResource) (*plugintypes.SetNodeResourceInfoResponse, error) {
+func (p Plugin) SetNodeResourceInfo(ctx context.Context, nodename string, capacity *plugintypes.NodeResource, usage *plugintypes.NodeResource) error {
 	capacityResource := &storagetypes.NodeResource{}
 	usageResource := &storagetypes.NodeResource{}
-
+	// TODO this api need capacity with data!!!!
 	if err := capacityResource.Parse(capacity); err != nil {
-		return nil, err
+		return err
+	}
+	if capacityResource.Volumes != nil {
+		capacityResource.Storage += capacityResource.Volumes.Total()
 	}
 	if err := usageResource.Parse(usage); err != nil {
-		return nil, err
+		return err
 	}
 
 	resourceInfo := &storagetypes.NodeResourceInfo{
@@ -176,7 +179,7 @@ func (p Plugin) SetNodeResourceInfo(ctx context.Context, nodename string, capaci
 		Usage:    usageResource,
 	}
 
-	return &plugintypes.SetNodeResourceInfoResponse{}, p.doSetNodeResourceInfo(ctx, nodename, resourceInfo)
+	return p.doSetNodeResourceInfo(ctx, nodename, resourceInfo)
 }
 
 func (p Plugin) SetNodeResourceUsage(ctx context.Context, nodename string, resource *plugintypes.NodeResource, resourceRequest *plugintypes.NodeResourceRequest, workloadsResource []*plugintypes.WorkloadResource, delta bool, incr bool) (*coretypes.RawParams, error) {

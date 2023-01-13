@@ -27,3 +27,25 @@ func getNodeResourceInfo(c *cli.Context) error {
 		return s.GetNodeResourceInfo(c.Context, nodename, workloadsResource)
 	})
 }
+
+func SetNodeResourceInfo() *cli.Command {
+	return &cli.Command{
+		Name:   binary.SetNodeResourceInfoCommand,
+		Usage:  "set node resource info",
+		Action: setNodeResourceInfo,
+	}
+}
+
+func setNodeResourceInfo(c *cli.Context) error {
+	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
+		nodename := in.String("nodename")
+		if nodename == "" {
+			return nil, types.ErrEmptyNodeName
+		}
+
+		capacity := in.RawParams("capacity")
+		usage := in.RawParams("usage")
+
+		return nil, s.SetNodeResourceInfo(c.Context, nodename, capacity, usage)
+	})
+}
