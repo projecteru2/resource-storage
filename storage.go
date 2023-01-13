@@ -31,6 +31,7 @@ func main() {
 		node.RemoveNode(),
 		node.GetNodesDeployCapacity(),
 		node.SetNodeResourceCapacity(),
+		node.GetNodeResourceInfo(),
 	}
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{

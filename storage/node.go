@@ -147,18 +147,17 @@ func (p Plugin) SetNodeResourceCapacity(ctx context.Context, nodename string, re
 	}, nil
 }
 
-func (p Plugin) GetNodeResourceInfo(ctx context.Context, nodename string, workloadsResource []*plugintypes.WorkloadResource) (*plugintypes.GetNodeResourceInfoResponse, error) {
+func (p Plugin) GetNodeResourceInfo(ctx context.Context, nodename string, workloadsResource []*plugintypes.WorkloadResource) (*coretypes.RawParams, error) {
 	nodeResourceInfo, _, _, _, diffs, err := p.getNodeResourceInfo(ctx, nodename, workloadsResource) // nolint
 	if err != nil {
 		return nil, err
 	}
 
-	resp := &plugintypes.GetNodeResourceInfoResponse{}
-	return resp, mapstructure.Decode(map[string]interface{}{
+	return &coretypes.RawParams{
 		"capacity": nodeResourceInfo.Capacity,
 		"usage":    nodeResourceInfo.Usage,
 		"diffs":    diffs,
-	}, resp)
+	}, nil
 }
 
 func (p Plugin) SetNodeResourceInfo(ctx context.Context, nodename string, capacity *plugintypes.NodeResource, usage *plugintypes.NodeResource) (*plugintypes.SetNodeResourceInfoResponse, error) {
@@ -270,7 +269,6 @@ func (p Plugin) getNodeResourceInfo(ctx context.Context, nodename string, worklo
 	if nodeResourceInfo.Usage.Storage != totalStorageUsage {
 		diffs = append(diffs, fmt.Sprintf("node.Storage != sum(workload.Storage): %+v != %+v", nodeResourceInfo.Usage.Storage, totalStorageUsage))
 	}
-
 	for volume, size := range nodeResourceInfo.Usage.Volumes {
 		if totalVolumeMap[volume] != size {
 			diffs = append(diffs, fmt.Sprintf("node.Volumes[%s] != sum(workload.Volumes[%s]): %+v != %+v", volume, volume, size, totalVolumeMap[volume]))

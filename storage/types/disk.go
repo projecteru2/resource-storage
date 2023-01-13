@@ -11,12 +11,12 @@ import (
 
 // Disk .
 type Disk struct {
-	Device    string   `json:"device"`
-	Mounts    []string `json:"mounts"`
-	ReadIOPS  int64    `json:"read_IOPS"`
-	WriteIOPS int64    `json:"write_IOPS"`
-	ReadBPS   int64    `json:"read_bps"`
-	WriteBPS  int64    `json:"write_bps"`
+	Device    string   `json:"device" mapstructure:"device"`
+	Mounts    []string `json:"mounts" mapstructure:"mounts"`
+	ReadIOPS  int64    `json:"read_IOPS" mapstructure:"read_IOPS"`
+	WriteIOPS int64    `json:"write_IOPS" mapstructure:"write_IOPS"`
+	ReadBPS   int64    `json:"read_bps" mapstructure:"read_bps"`
+	WriteBPS  int64    `json:"write_bps" mapstructure:"write_bps"`
 }
 
 // String .

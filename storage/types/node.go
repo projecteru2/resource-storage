@@ -12,9 +12,9 @@ import (
 
 // NodeResource .
 type NodeResource struct {
-	Volumes VolumeMap `json:"volumes"`
-	Disks   Disks     `json:"disks"`
-	Storage int64     `json:"storage"`
+	Volumes VolumeMap `json:"volumes" mapstructure:"volumes"`
+	Disks   Disks     `json:"disks" mapstructure:"disks"`
+	Storage int64     `json:"storage" mapstructure:"storage"`
 }
 
 // ParseFromRawParams .
