@@ -67,7 +67,7 @@ func (p Plugin) RemoveNode(ctx context.Context, nodename string) error {
 	return nil
 }
 
-func (p Plugin) GetNodesDeployCapacity(ctx context.Context, nodenames []string, resource *plugintypes.WorkloadResourceRequest) (*plugintypes.GetNodesDeployCapacityResponse, error) {
+func (p Plugin) GetNodesDeployCapacity(ctx context.Context, nodenames []string, resource *plugintypes.WorkloadResourceRequest) (*coretypes.RawParams, error) {
 	logger := log.WithFunc("resource.storage.GetNodesDeployCapacity")
 	req := &storagetypes.WorkloadResourceRequest{}
 	if err := req.Parse(resource); err != nil {
@@ -97,39 +97,21 @@ func (p Plugin) GetNodesDeployCapacity(ctx context.Context, nodenames []string, 
 		}
 	}
 
-	resp := &plugintypes.GetNodesDeployCapacityResponse{}
-	return resp, mapstructure.Decode(map[string]interface{}{
+	return &coretypes.RawParams{
 		"nodes_deploy_capacity_map": nodesDeployCapacityMap,
 		"total":                     total,
-	}, resp)
+	}, nil
 }
 
-func (p Plugin) SetNodeResourceCapacity(ctx context.Context, nodename string, resource *plugintypes.NodeResource, resourceRequest *plugintypes.NodeResourceRequest, delta bool, incr bool) (*plugintypes.SetNodeResourceCapacityResponse, error) {
-	var req *storagetypes.NodeResourceRequest
-	var nodeResource *storagetypes.NodeResource
+func (p Plugin) SetNodeResourceCapacity(ctx context.Context, nodename string, resource *plugintypes.NodeResource, resourceRequest *plugintypes.NodeResourceRequest, delta bool, incr bool) (*coretypes.RawParams, error) {
 	logger := log.WithFunc("resource.storage.SetNodeResourceCapacity").WithField("node", "nodename")
-
-	if resourceRequest != nil {
-		req = &storagetypes.NodeResourceRequest{}
-		if err := req.Parse(resourceRequest); err != nil {
-			return nil, err
-		}
-	}
-
-	if resource != nil {
-		nodeResource = &storagetypes.NodeResource{}
-		if err := nodeResource.Parse(resource); err != nil {
-			return nil, err
-		}
-	}
-
-	nodeResourceInfo, err := p.doGetNodeResourceInfo(ctx, nodename)
+	req, nodeResource, _, nodeResourceInfo, err := p.parseNodeResourceInfos(ctx, nodename, resource, resourceRequest, nil)
 	if err != nil {
-		logger.Error(ctx, err)
 		return nil, err
 	}
+	origin := nodeResourceInfo.Capacity
+	before := origin.DeepCopy()
 
-	before := nodeResourceInfo.Capacity.DeepCopy()
 	if req != nil {
 		if len(req.RMDisks) > 0 {
 			if delta {
@@ -159,11 +141,10 @@ func (p Plugin) SetNodeResourceCapacity(ctx context.Context, nodename string, re
 		return nil, err
 	}
 
-	resp := &plugintypes.SetNodeResourceCapacityResponse{}
-	return resp, mapstructure.Decode(map[string]interface{}{
+	return &coretypes.RawParams{
 		"before": before,
 		"after":  nodeResourceInfo.Capacity,
-	}, resp)
+	}, nil
 }
 
 func (p Plugin) GetNodeResourceInfo(ctx context.Context, nodename string, workloadsResource []*plugintypes.WorkloadResource) (*plugintypes.GetNodeResourceInfoResponse, error) {
@@ -199,50 +180,26 @@ func (p Plugin) SetNodeResourceInfo(ctx context.Context, nodename string, capaci
 	return &plugintypes.SetNodeResourceInfoResponse{}, p.doSetNodeResourceInfo(ctx, nodename, resourceInfo)
 }
 
-func (p Plugin) SetNodeResourceUsage(ctx context.Context, nodename string, resource *plugintypes.NodeResource, resourceRequest *plugintypes.NodeResourceRequest, workloadsResource []*plugintypes.WorkloadResource, delta bool, incr bool) (*plugintypes.SetNodeResourceUsageResponse, error) {
-	var req *storagetypes.NodeResourceRequest
-	var nodeResource *storagetypes.NodeResource
-
-	if resourceRequest != nil {
-		req = &storagetypes.NodeResourceRequest{}
-		if err := req.Parse(resourceRequest); err != nil {
-			return nil, err
-		}
-	}
-
-	if resource != nil {
-		nodeResource = &storagetypes.NodeResource{}
-		if err := nodeResource.Parse(resource); err != nil {
-			return nil, err
-		}
-	}
-
-	wrksResource := []*storagetypes.WorkloadResource{}
-	for _, workloadResource := range workloadsResource {
-		wrkResource := &storagetypes.WorkloadResource{}
-		if err := wrkResource.Parse(workloadResource); err != nil {
-			return nil, err
-		}
-	}
-
-	nodeResourceInfo, err := p.doGetNodeResourceInfo(ctx, nodename)
+func (p Plugin) SetNodeResourceUsage(ctx context.Context, nodename string, resource *plugintypes.NodeResource, resourceRequest *plugintypes.NodeResourceRequest, workloadsResource []*plugintypes.WorkloadResource, delta bool, incr bool) (*coretypes.RawParams, error) {
+	logger := log.WithFunc("resource.storage.SetNodeResourceUsage").WithField("node", "nodename")
+	req, nodeResource, wrksResource, nodeResourceInfo, err := p.parseNodeResourceInfos(ctx, nodename, resource, resourceRequest, workloadsResource)
 	if err != nil {
-		log.WithFunc("resource.storage.SetNodeResourceUsage").WithField("node", nodename).Error(ctx, err)
 		return nil, err
 	}
+	origin := nodeResourceInfo.Usage
+	before := origin.DeepCopy()
 
-	before := nodeResourceInfo.Usage.DeepCopy()
 	nodeResourceInfo.Usage = p.calculateNodeResource(req, nodeResource, nodeResourceInfo.Usage, wrksResource, delta, incr)
 
 	if err := p.doSetNodeResourceInfo(ctx, nodename, nodeResourceInfo); err != nil {
+		logger.Errorf(ctx, err, "node resource info %+v", litter.Sdump(nodeResourceInfo))
 		return nil, err
 	}
 
-	resp := &plugintypes.SetNodeResourceUsageResponse{}
-	return resp, mapstructure.Decode(map[string]interface{}{
+	return &coretypes.RawParams{
 		"before": before,
-		"after":  nodeResourceInfo,
-	}, resp)
+		"after":  nodeResourceInfo.Usage,
+	}, nil
 }
 
 func (p Plugin) GetMostIdleNode(ctx context.Context, nodenames []string) (*plugintypes.GetMostIdleNodeResponse, error) {
@@ -445,4 +402,48 @@ func (p Plugin) calculateNodeResource(req *storagetypes.NodeResourceRequest, nod
 		}
 	}
 	return resp
+}
+func (p Plugin) parseNodeResourceInfos(
+	ctx context.Context, nodename string,
+	resource *plugintypes.NodeResource,
+	resourceRequest *plugintypes.NodeResourceRequest,
+	workloadsResource []*plugintypes.WorkloadResource,
+) (
+	*storagetypes.NodeResourceRequest,
+	*storagetypes.NodeResource,
+	[]*storagetypes.WorkloadResource,
+	*storagetypes.NodeResourceInfo,
+	error,
+) {
+	var req *storagetypes.NodeResourceRequest
+	var nodeResource *storagetypes.NodeResource
+	wrksResource := []*storagetypes.WorkloadResource{}
+
+	if resourceRequest != nil {
+		req = &storagetypes.NodeResourceRequest{}
+		if err := req.Parse(resourceRequest); err != nil {
+			return nil, nil, nil, nil, err
+		}
+	}
+
+	if resource != nil {
+		nodeResource = &storagetypes.NodeResource{}
+		if err := nodeResource.Parse(resource); err != nil {
+			return nil, nil, nil, nil, err
+		}
+	}
+
+	for _, workloadResource := range workloadsResource {
+		wrkResource := &storagetypes.WorkloadResource{}
+		if err := wrkResource.Parse(workloadResource); err != nil {
+			return nil, nil, nil, nil, err
+		}
+		wrksResource = append(wrksResource, wrkResource)
+	}
+
+	nodeResourceInfo, err := p.doGetNodeResourceInfo(ctx, nodename)
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+	return req, nodeResource, wrksResource, nodeResourceInfo, nil
 }

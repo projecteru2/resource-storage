@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func AddNodeCommand() *cli.Command {
+func AddNode() *cli.Command {
 	return &cli.Command{
 		Name:   binary.AddNodeCommand,
 		Usage:  "add node",
@@ -19,7 +19,7 @@ func AddNodeCommand() *cli.Command {
 	}
 }
 
-func RemoveNodeCommand() *cli.Command {
+func RemoveNode() *cli.Command {
 	return &cli.Command{
 		Name:   binary.RemoveNodeCommand,
 		Usage:  "remove node",
@@ -40,7 +40,6 @@ func addNode(c *cli.Context) error {
 			return nil, err
 		}
 		return s.AddNode(c.Context, nodename, resource, info)
-
 	})
 }
 

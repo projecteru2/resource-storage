@@ -9,7 +9,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func DescriptionCommand() *cli.Command {
+func Description() *cli.Command {
 	return &cli.Command{
 		Name:   binary.GetMetricsDescriptionCommand,
 		Usage:  "show metrics descriptions",

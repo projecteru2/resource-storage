@@ -23,11 +23,14 @@ func main() {
 	app.Usage = "Run eru resource storage plugin"
 	app.Version = version.VERSION
 	app.Commands = []*cli.Command{
-		storage.Command(),
-		metrics.DescriptionCommand(),
-		metrics.GetMetricsCommand(),
-		node.AddNodeCommand(),
-		node.RemoveNodeCommand(),
+		storage.Name(),
+		metrics.Description(),
+		metrics.GetMetrics(),
+
+		node.AddNode(),
+		node.RemoveNode(),
+		node.GetNodesDeployCapacity(),
+		node.SetNodeResourceCapacity(),
 	}
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
