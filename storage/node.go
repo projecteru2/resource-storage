@@ -204,13 +204,12 @@ func (p Plugin) SetNodeResourceUsage(ctx context.Context, nodename string, resou
 	}, nil
 }
 
-func (p Plugin) GetMostIdleNode(ctx context.Context, nodenames []string) (*plugintypes.GetMostIdleNodeResponse, error) {
+func (p Plugin) GetMostIdleNode(ctx context.Context, nodenames []string) (*coretypes.RawParams, error) {
 	nodename := nodenames[0]
-	resp := &plugintypes.GetMostIdleNodeResponse{}
-	return resp, mapstructure.Decode(map[string]interface{}{
+	return &coretypes.RawParams{
 		"nodename": nodename,
 		"priority": 1, // TODO why 1?
-	}, resp)
+	}, nil
 }
 
 func (p Plugin) FixNodeResource(ctx context.Context, nodename string, workloadsResource []*plugintypes.WorkloadResource) (*plugintypes.GetNodeResourceInfoResponse, error) {
