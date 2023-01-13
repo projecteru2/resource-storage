@@ -49,3 +49,23 @@ func setNodeResourceInfo(c *cli.Context) error {
 		return nil, s.SetNodeResourceInfo(c.Context, nodename, capacity, usage)
 	})
 }
+
+func FixNodeResource() *cli.Command {
+	return &cli.Command{
+		Name:   binary.FixNodeResourceCommand,
+		Usage:  "fix node resource",
+		Action: fixNodeResource,
+	}
+}
+
+func fixNodeResource(c *cli.Context) error {
+	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
+		nodename := in.String("nodename")
+		if nodename == "" {
+			return nil, types.ErrEmptyNodeName
+		}
+
+		workloadsResource := in.SliceRawParams("workloads_resource")
+		return s.FixNodeResource(c.Context, nodename, workloadsResource)
+	})
+}

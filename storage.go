@@ -35,6 +35,7 @@ func main() {
 		node.SetNodeResourceInfo(),
 		node.SetNodeResourceUsage(),
 		node.GetMostIdleNode(),
+		node.FixNodeResource(),
 	}
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
