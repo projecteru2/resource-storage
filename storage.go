@@ -33,6 +33,7 @@ func main() {
 		node.SetNodeResourceCapacity(),
 		node.GetNodeResourceInfo(),
 		node.SetNodeResourceInfo(),
+		node.SetNodeResourceUsage(),
 	}
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
