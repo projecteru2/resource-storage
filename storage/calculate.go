@@ -7,7 +7,6 @@ import (
 	storagetypes "github.com/projecteru2/resource-storage/storage/types"
 
 	"github.com/cockroachdb/errors"
-	"github.com/mitchellh/mapstructure"
 	"github.com/projecteru2/core/log"
 	plugintypes "github.com/projecteru2/core/resource3/plugins/types"
 	coretypes "github.com/projecteru2/core/types"
@@ -15,7 +14,7 @@ import (
 	"github.com/sanity-io/litter"
 )
 
-func (p Plugin) CalculateDeploy(ctx context.Context, nodename string, deployCount int, resourceRequest *plugintypes.WorkloadResourceRequest) (*plugintypes.CalculateDeployResponse, error) {
+func (p Plugin) CalculateDeploy(ctx context.Context, nodename string, deployCount int, resourceRequest *plugintypes.WorkloadResourceRequest) (*coretypes.RawParams, error) {
 	logger := log.WithFunc("resource.storage.CalculateDeploy").WithField("node", nodename)
 	req := &storagetypes.WorkloadResourceRequest{}
 	if err := req.Parse(resourceRequest); err != nil {
@@ -37,14 +36,13 @@ func (p Plugin) CalculateDeploy(ctx context.Context, nodename string, deployCoun
 		return nil, err
 	}
 
-	resp := &plugintypes.CalculateDeployResponse{}
-	return resp, mapstructure.Decode(map[string]interface{}{
+	return &coretypes.RawParams{
 		"engines_params":     enginesParams,
 		"workloads_resource": workloadsResource,
-	}, resp)
+	}, nil
 }
 
-func (p Plugin) CalculateRealloc(ctx context.Context, nodename string, resource *plugintypes.WorkloadResource, resourceRequest *plugintypes.WorkloadResourceRequest) (*plugintypes.CalculateReallocResponse, error) {
+func (p Plugin) CalculateRealloc(ctx context.Context, nodename string, resource *plugintypes.WorkloadResource, resourceRequest *plugintypes.WorkloadResourceRequest) (*coretypes.RawParams, error) {
 	logger := log.WithFunc("resource.storage.CalculateRealloc").WithField("node", nodename)
 	req := &storagetypes.WorkloadResourceRequest{}
 	if err := req.Parse(resourceRequest); err != nil {
@@ -126,20 +124,18 @@ func (p Plugin) CalculateRealloc(ctx context.Context, nodename string, resource 
 
 	deltaWorkloadResource := getDeltaWorkloadResourceArgs(originResource, targetWorkloadResource)
 
-	resp := &plugintypes.CalculateReallocResponse{}
-	return resp, mapstructure.Decode(map[string]interface{}{
+	return &coretypes.RawParams{
 		"engine_params":     engineParams,
 		"delta_resource":    deltaWorkloadResource,
 		"workload_resource": targetWorkloadResource,
-	}, resp)
+	}, nil
 }
 
-func (p Plugin) CalculateRemap(ctx context.Context, nodename string, workloadsResource map[string]*plugintypes.WorkloadResource) (*plugintypes.CalculateRemapResponse, error) {
+func (p Plugin) CalculateRemap(ctx context.Context, nodename string, workloadsResource map[string]*plugintypes.WorkloadResource) (*coretypes.RawParams, error) {
 	// NO NEED REMAP VOLUME
-	resp := &plugintypes.CalculateRemapResponse{}
-	return resp, mapstructure.Decode(map[string]interface{}{
+	return &coretypes.RawParams{
 		"engine_params_map": nil,
-	}, resp)
+	}, nil
 }
 
 func (p Plugin) doAlloc(resourceInfo *storagetypes.NodeResourceInfo, deployCount int, req *storagetypes.WorkloadResourceRequest) ([]*storagetypes.EngineParams, []*storagetypes.WorkloadResource, error) {

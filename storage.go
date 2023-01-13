@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/projecteru2/resource-storage/cmd"
+	"github.com/projecteru2/resource-storage/cmd/calculate"
 	"github.com/projecteru2/resource-storage/cmd/metrics"
 	"github.com/projecteru2/resource-storage/cmd/node"
 	"github.com/projecteru2/resource-storage/cmd/storage"
@@ -36,6 +37,10 @@ func main() {
 		node.SetNodeResourceUsage(),
 		node.GetMostIdleNode(),
 		node.FixNodeResource(),
+
+		calculate.CalculateDeploy(),
+		calculate.CalculateRealloc(),
+		calculate.CalculateRemap(),
 	}
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
