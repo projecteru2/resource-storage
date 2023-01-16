@@ -4,9 +4,11 @@ go 1.19
 
 require (
 	github.com/cockroachdb/errors v1.9.0
+	github.com/docker/go-units v0.5.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/projecteru2/core v0.0.0-20221220031403-44dca268bd1f
 	github.com/sanity-io/litter v1.5.5
+	github.com/stretchr/testify v1.8.1
 	github.com/urfave/cli/v2 v2.23.7
 )
 
@@ -22,8 +24,8 @@ require (
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.3-0.20220203105225-a9a7ef127534 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
-	github.com/docker/go-units v0.5.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/getsentry/sentry-go v0.16.0 // indirect
 	github.com/go-logr/logr v1.2.2 // indirect
@@ -50,6 +52,7 @@ require (
 	github.com/panjf2000/ants/v2 v2.7.0 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.11.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.30.0 // indirect
@@ -94,6 +97,7 @@ require (
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 

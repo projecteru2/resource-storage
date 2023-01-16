@@ -42,6 +42,9 @@ type WorkloadResourceRequest struct {
 
 // Validate .
 func (w *WorkloadResourceRequest) Validate() error {
+	if len(w.VolumesRequest) == 0 && len(w.VolumesLimit) == 0 && w.StorageLimit == 0 && w.StorageRequest == 0 {
+		return ErrInvalidVolume
+	}
 	return errors.CombineErrors(
 		w.validateVolumes(),
 		w.validateStorage(),

@@ -76,6 +76,7 @@ func (p Plugin) GetNodesDeployCapacity(ctx context.Context, nodenames []string, 
 
 	if err := req.Validate(); err != nil {
 		logger.Errorf(ctx, err, "invalid resource opts %+v", req)
+		return nil, err
 	}
 
 	nodesDeployCapacityMap := map[string]*plugintypes.NodeDeployCapacity{}
@@ -339,7 +340,7 @@ func (p Plugin) doGetNodeDeployCapacity(nodeResourceInfo *storagetypes.NodeResou
 	// get storage capacity
 	if req.StorageRequest > 0 {
 		storageCapacity := int((nodeResourceInfo.Capacity.Storage - nodeResourceInfo.Usage.Storage) / req.StorageRequest)
-		if storageCapacity < capacityInfo.Capacity {
+		if req.VolumesLimit == nil || (storageCapacity < capacityInfo.Capacity) {
 			capacityInfo.Capacity = storageCapacity
 		}
 	}
@@ -403,6 +404,7 @@ func (p Plugin) calculateNodeResource(req *storagetypes.NodeResourceRequest, nod
 	}
 	return resp
 }
+
 func (p Plugin) parseNodeResourceInfos(
 	ctx context.Context, nodename string,
 	resource *plugintypes.NodeResource,
