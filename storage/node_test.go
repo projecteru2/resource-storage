@@ -144,3 +144,69 @@ func TestSetNodeResourceCapacity(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, v.Storage, int64(2*units.TiB))
 }
+
+func TestGetNodeResourceInfo(t *testing.T) {
+	ctx := context.Background()
+	st := initStorage(ctx, t)
+	vols := []string{"/data0:1T", "/data1:1T", "/data2:1T", "/data3:1T"}
+	nodes := generateNodes(ctx, t, st, 1, vols, 0)
+	node := nodes[0]
+
+	// invalid node
+	_, err := st.GetNodeResourceInfo(ctx, "abc", nil)
+	assert.Error(t, err)
+
+	// normal case
+	d, err := st.GetNodeResourceInfo(ctx, node, nil)
+	assert.NoError(t, err)
+	v, ok := (*d)["capacity"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(4*units.TiB))
+
+	// diffs
+	workloadsResource := []*plugintypes.WorkloadResource{
+		{"storage_request": 1},
+		{"storage_limit": 1},
+	}
+
+	d, err = st.GetNodeResourceInfo(ctx, node, nil)
+	assert.NoError(t, err)
+	v, ok = (*d)["capacity"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(4*units.TiB))
+
+	d, err = st.GetNodeResourceInfo(ctx, node, workloadsResource)
+	v2, ok := (*d)["diffs"].([]string)
+	assert.True(t, ok)
+	assert.NotEmpty(t, v2)
+}
+
+func TestFixNodeResource(t *testing.T) {
+	ctx := context.Background()
+	st := initStorage(ctx, t)
+	vols := []string{"/data0:1T", "/data1:1T", "/data2:1T", "/data3:1T"}
+	nodes := generateNodes(ctx, t, st, 1, vols, 0)
+	node := nodes[0]
+
+	// invalid node
+	_, err := st.FixNodeResource(ctx, "abc", nil)
+	assert.Error(t, err)
+
+	// normal case
+	workloadsResource := []*plugintypes.WorkloadResource{
+		{"storage_request": 1},
+		{"storage_limit": 1},
+	}
+
+	d, err := st.FixNodeResource(ctx, node, workloadsResource)
+	assert.NoError(t, err)
+	v2, ok := (*d)["diffs"].([]string)
+	assert.True(t, ok)
+	assert.NotEmpty(t, v2)
+
+	d, err = st.GetNodeResourceInfo(ctx, node, nil)
+	assert.NoError(t, err)
+	v, ok := (*d)["usage"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(1))
+}

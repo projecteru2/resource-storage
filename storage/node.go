@@ -10,7 +10,6 @@ import (
 	storagetypes "github.com/projecteru2/resource-storage/storage/types"
 
 	"github.com/cockroachdb/errors"
-	"github.com/mitchellh/mapstructure"
 	enginetypes "github.com/projecteru2/core/engine/types"
 	"github.com/projecteru2/core/log"
 	plugintypes "github.com/projecteru2/core/resource3/plugins/types"
@@ -213,7 +212,7 @@ func (p Plugin) GetMostIdleNode(ctx context.Context, nodenames []string) (*coret
 	}, nil
 }
 
-func (p Plugin) FixNodeResource(ctx context.Context, nodename string, workloadsResource []*plugintypes.WorkloadResource) (*plugintypes.GetNodeResourceInfoResponse, error) {
+func (p Plugin) FixNodeResource(ctx context.Context, nodename string, workloadsResource []*plugintypes.WorkloadResource) (*coretypes.RawParams, error) {
 	nodeResourceInfo, totalVolumeMap, totalDiskUsage, totalStorageUsage, diffs, err := p.getNodeResourceInfo(ctx, nodename, workloadsResource)
 	if err != nil {
 		return nil, err
@@ -231,12 +230,11 @@ func (p Plugin) FixNodeResource(ctx context.Context, nodename string, workloadsR
 		}
 	}
 
-	resp := &plugintypes.GetNodeResourceInfoResponse{}
-	return resp, mapstructure.Decode(map[string]interface{}{
+	return &coretypes.RawParams{
 		"capacity": nodeResourceInfo.Capacity,
 		"usage":    nodeResourceInfo.Usage,
 		"diffs":    diffs,
-	}, resp)
+	}, nil
 }
 
 func (p Plugin) getNodeResourceInfo(ctx context.Context, nodename string, workloadsResource []*plugintypes.WorkloadResource) (
