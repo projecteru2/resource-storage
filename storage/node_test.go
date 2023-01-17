@@ -176,6 +176,7 @@ func TestGetNodeResourceInfo(t *testing.T) {
 	assert.Equal(t, v.Storage, int64(4*units.TiB))
 
 	d, err = st.GetNodeResourceInfo(ctx, node, workloadsResource)
+	assert.NoError(t, err)
 	v2, ok := (*d)["diffs"].([]string)
 	assert.True(t, ok)
 	assert.NotEmpty(t, v2)

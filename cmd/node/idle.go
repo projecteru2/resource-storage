@@ -19,7 +19,7 @@ func GetMostIdleNode() *cli.Command {
 func getMostIdleNode(c *cli.Context) error {
 	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
 		nodenames := in.StringSlice("nodenames")
-		if nodenames == nil || len(nodenames) == 0 {
+		if len(nodenames) == 0 {
 			return nil, types.ErrEmptyNodeName
 		}
 

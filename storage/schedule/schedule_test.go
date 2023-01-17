@@ -286,7 +286,6 @@ func generateExistingVolumePlan(t *testing.T) (types.VolumeBindings, types.Volum
 }
 
 func TestGetVolumePlansWithIOPS(t *testing.T) {
-	resourceInfo := generateResourceInfo()
 	requests := []types.VolumeBindings{
 		generateVolumeBindings(t, []string{
 			"AUTO:/dir1:rw:500GiB:500:100:100M:100M",
@@ -302,7 +301,7 @@ func TestGetVolumePlansWithIOPS(t *testing.T) {
 	}
 
 	for _, volumeRequest := range requests {
-		resourceInfo = generateResourceInfo()
+		resourceInfo := generateResourceInfo()
 		plans, _ := GetVolumePlans(resourceInfo, volumeRequest, maxDeployCount)
 		validateVolumePlans(t, resourceInfo, volumeRequest, plans)
 	}

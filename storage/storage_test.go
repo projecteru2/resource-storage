@@ -47,7 +47,7 @@ func generateNodes(
 	}
 	t.Cleanup(func() {
 		for name := range reqs {
-			st.RemoveNode(ctx, name)
+			_ = st.RemoveNode(ctx, name)
 		}
 	})
 	return names

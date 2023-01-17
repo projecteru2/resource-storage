@@ -54,10 +54,10 @@ func TestCalculateDeploy(t *testing.T) {
 			"AUTO:/dir0:rwm:1T",
 		},
 	}
-	d, err = st.CalculateDeploy(ctx, node, 10, req)
+	_, err = st.CalculateDeploy(ctx, node, 10, req)
 	assert.Error(t, err)
 
-	d, err = st.CalculateDeploy(ctx, node, 1, req)
+	_, err = st.CalculateDeploy(ctx, node, 1, req)
 	assert.NoError(t, err)
 }
 
