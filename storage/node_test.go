@@ -10,7 +10,6 @@ import (
 	plugintypes "github.com/projecteru2/core/resource3/plugins/types"
 	coretypes "github.com/projecteru2/core/types"
 	"github.com/projecteru2/resource-storage/storage/types"
-	storagetypes "github.com/projecteru2/resource-storage/storage/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,7 +33,7 @@ func TestAddNode(t *testing.T) {
 	// normal case
 	r, err := st.AddNode(ctx, nodeForAdd, req, info)
 	assert.Nil(t, err)
-	ni, ok := (*r)["capacity"].(*storagetypes.NodeResource)
+	ni, ok := (*r)["capacity"].(*types.NodeResource)
 	assert.True(t, ok)
 	assert.Equal(t, ni.Storage, int64(units.TiB))
 }
@@ -90,4 +89,58 @@ func TestGetNodesDeployCapacity(t *testing.T) {
 	r, err = st.GetNodesDeployCapacity(ctx, nodes, req)
 	assert.NoError(t, err)
 	assert.Equal(t, (*r)["total"], 30)
+}
+
+func TestSetNodeResourceCapacity(t *testing.T) {
+	ctx := context.Background()
+	st := initStorage(ctx, t)
+	vols := []string{"/data0:1T", "/data1:1T", "/data2:1T", "/data3:1T"}
+	nodes := generateNodes(ctx, t, st, 1, vols, 0)
+	node := nodes[0]
+
+	r, err := st.GetNodeResourceInfo(ctx, nodes[0], nil)
+	assert.Nil(t, err)
+	v, ok := (*r)["capacity"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(4*units.TiB))
+
+	resourceRequest := &plugintypes.NodeResourceRequest{
+		"volumes": []string{"/data4:1T"},
+		"storage": "1T",
+	}
+
+	nodeResource := &plugintypes.NodeResource{
+		"volumes": types.VolumeMap{"/data4": units.TiB},
+		"storage": units.TiB,
+	}
+
+	d, err := st.SetNodeResourceCapacity(ctx, node, nodeResource, nil, true, true)
+	assert.NoError(t, err)
+	v, ok = (*d)["after"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(5*units.TiB))
+
+	d, err = st.SetNodeResourceCapacity(ctx, node, nodeResource, nil, true, false)
+	assert.NoError(t, err)
+	v, ok = (*d)["after"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(4*units.TiB))
+
+	d, err = st.SetNodeResourceCapacity(ctx, node, nil, resourceRequest, true, true)
+	assert.NoError(t, err)
+	v, ok = (*d)["after"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(6*units.TiB))
+
+	d, err = st.SetNodeResourceCapacity(ctx, node, nil, resourceRequest, true, false)
+	assert.NoError(t, err)
+	v, ok = (*d)["after"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(4*units.TiB))
+
+	d, err = st.SetNodeResourceCapacity(ctx, node, nil, resourceRequest, false, false)
+	assert.NoError(t, err)
+	v, ok = (*d)["after"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(2*units.TiB))
 }
