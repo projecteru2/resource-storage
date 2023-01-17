@@ -181,6 +181,98 @@ func TestGetNodeResourceInfo(t *testing.T) {
 	assert.NotEmpty(t, v2)
 }
 
+func TestSetNodeResourceInfo(t *testing.T) {
+
+}
+
+func TestSetNodeResourceUsage(t *testing.T) {
+	ctx := context.Background()
+	st := initStorage(ctx, t)
+	vols := []string{"/data0:1T", "/data1:1T", "/data2:1T", "/data3:1T"}
+	nodes := generateNodes(ctx, t, st, 1, vols, 0)
+	node := nodes[0]
+
+	r, err := st.GetNodeResourceInfo(ctx, nodes[0], nil)
+	assert.Nil(t, err)
+	v, ok := (*r)["capacity"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(4*units.TiB))
+
+	resourceRequest := &plugintypes.NodeResourceRequest{
+		"volumes": []string{"/data4:1T"},
+		"storage": "1T",
+	}
+
+	nodeResource := &plugintypes.NodeResource{
+		"volumes": types.VolumeMap{"/data4": units.TiB},
+		"storage": units.TiB,
+	}
+
+	workloadsResource := []*plugintypes.WorkloadResource{
+		{"storage_request": 1},
+		{"storage_limit": 1},
+	}
+
+	d, err := st.SetNodeResourceUsage(ctx, node, nodeResource, nil, nil, true, true)
+	assert.NoError(t, err)
+	v, ok = (*d)["after"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(units.TiB))
+
+	d, err = st.SetNodeResourceUsage(ctx, node, nodeResource, nil, nil, true, false)
+	assert.NoError(t, err)
+	v, ok = (*d)["after"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(0))
+
+	d, err = st.SetNodeResourceUsage(ctx, node, nil, resourceRequest, nil, true, true)
+	assert.NoError(t, err)
+	v, ok = (*d)["after"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(2*units.TiB))
+
+	d, err = st.SetNodeResourceUsage(ctx, node, nil, resourceRequest, nil, true, false)
+	assert.NoError(t, err)
+	v, ok = (*d)["after"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(0))
+
+	d, err = st.SetNodeResourceUsage(ctx, node, nil, nil, nil, true, false)
+	assert.NoError(t, err)
+	v, ok = (*d)["after"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(0))
+
+	d, err = st.SetNodeResourceUsage(ctx, node, nil, nil, workloadsResource, true, true)
+	assert.NoError(t, err)
+	v, ok = (*d)["after"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(1))
+
+	d, err = st.SetNodeResourceUsage(ctx, node, nil, nil, workloadsResource, true, false)
+	assert.NoError(t, err)
+	v, ok = (*d)["after"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(0))
+
+	d, err = st.SetNodeResourceUsage(ctx, node, nodeResource, nil, nil, false, false)
+	assert.NoError(t, err)
+	v, ok = (*d)["after"].(*types.NodeResource)
+	assert.True(t, ok)
+	assert.Equal(t, v.Storage, int64(units.TiB))
+}
+
+func TestGetMostIdleNode(t *testing.T) {
+	ctx := context.Background()
+	st := initStorage(ctx, t)
+	vols := []string{"/data0:1T", "/data1:1T", "/data2:1T", "/data3:1T"}
+	nodes := generateNodes(ctx, t, st, 1, vols, 0)
+
+	d, err := st.GetMostIdleNode(ctx, nodes)
+	assert.NoError(t, err)
+	assert.Equal(t, (*d)["nodename"], nodes[0])
+}
+
 func TestFixNodeResource(t *testing.T) {
 	ctx := context.Background()
 	st := initStorage(ctx, t)
