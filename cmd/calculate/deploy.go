@@ -11,7 +11,7 @@ import (
 func CalculateDeploy() *cli.Command {
 	return &cli.Command{
 		Name:   binary.CalculateDeployCommand,
-		Usage:  "calculate deploy pan",
+		Usage:  "calculate deploy plan",
 		Action: calculateDeploy,
 	}
 }
