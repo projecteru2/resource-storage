@@ -152,7 +152,7 @@ func (h *host) getMonoPlan(monoRequests types.VolumeBindings, volume *volume) (t
 	// allocate proportionally
 	for _, req := range monoRequests {
 		size := int64(float64(req.SizeInBytes) / float64(totalSize) * float64(volumeSize))
-		volumePlan[req] = types.VolumeMap{volume.device: size}
+		volumePlan[req] = types.Volumes{volume.device: size}
 		volume.size -= size
 	}
 
@@ -234,7 +234,7 @@ func (h *host) getNormalPlan(normalRequests types.VolumeBindings) (types.VolumeP
 			// decrease resource and generate plans
 			h.decreaseIOPSQuota(disk, req)
 			volume.size -= req.SizeInBytes
-			volumePlan[req] = types.VolumeMap{volume.device: req.SizeInBytes}
+			volumePlan[req] = types.Volumes{volume.device: req.SizeInBytes}
 			diskPlan.Add(types.Disks{&types.Disk{
 				Device:    disk.Device,
 				Mounts:    disk.Mounts,
@@ -322,7 +322,7 @@ func (h *host) getUnlimitedPlans(normalPlans, monoPlans []types.VolumePlan, unli
 	return utils.GenerateSlice(capacity, func() types.VolumePlan {
 		volumePlan := types.VolumePlan{}
 		for _, req := range unlimitedRequests {
-			volumePlan[req] = types.VolumeMap{volumeWithLargestSize.device: req.SizeInBytes}
+			volumePlan[req] = types.Volumes{volumeWithLargestSize.device: req.SizeInBytes}
 		}
 		return volumePlan
 	}), nil
@@ -478,9 +478,9 @@ func (h *host) getVolumeByDevice(device string) *volume {
 	return nil
 }
 
-func (h *host) classifyAffinityRequests(requests types.VolumeBindings, existing types.VolumePlan) (affinity map[*types.VolumeBinding]types.VolumeMap, nonAffinity map[*types.VolumeBinding]types.VolumeMap) {
-	affinity = map[*types.VolumeBinding]types.VolumeMap{}
-	nonAffinity = map[*types.VolumeBinding]types.VolumeMap{}
+func (h *host) classifyAffinityRequests(requests types.VolumeBindings, existing types.VolumePlan) (affinity map[*types.VolumeBinding]types.Volumes, nonAffinity map[*types.VolumeBinding]types.Volumes) {
+	affinity = map[*types.VolumeBinding]types.Volumes{}
+	nonAffinity = map[*types.VolumeBinding]types.Volumes{}
 
 	for _, req := range requests {
 		found := false
@@ -554,7 +554,7 @@ func (h *host) getAffinityPlan(requests types.VolumeBindings, originVolumePlan t
 				return coretypes.ErrInsufficientResource
 			}
 			volume.size -= req.SizeInBytes
-			volumePlan.Merge(types.VolumePlan{req: types.VolumeMap{volume.device: req.SizeInBytes}})
+			volumePlan.Merge(types.VolumePlan{req: types.Volumes{volume.device: req.SizeInBytes}})
 
 			// check if the disk has enough IOPS quota
 			if !req.RequireIOPS() {

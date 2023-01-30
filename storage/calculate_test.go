@@ -83,9 +83,9 @@ func TestCalculateRealloc(t *testing.T) {
 	assert.NoError(t, err)
 
 	plan := types.VolumePlan{
-		b1: types.VolumeMap{"/data0": 107374182400},
-		b2: types.VolumeMap{"/data2": 1099511627776},
-		b3: types.VolumeMap{"/data0": 0},
+		b1: types.Volumes{"/data0": 107374182400},
+		b2: types.Volumes{"/data2": 1099511627776},
+		b3: types.Volumes{"/data0": 0},
 	}
 
 	wrkResource := &types.WorkloadResource{

@@ -12,9 +12,9 @@ import (
 
 // NodeResource .
 type NodeResource struct {
-	Volumes VolumeMap `json:"volumes" mapstructure:"volumes"`
-	Disks   Disks     `json:"disks" mapstructure:"disks"`
-	Storage int64     `json:"storage" mapstructure:"storage"`
+	Volumes Volumes `json:"volumes" mapstructure:"volumes"`
+	Disks   Disks   `json:"disks" mapstructure:"disks"`
+	Storage int64   `json:"storage" mapstructure:"storage"`
 }
 
 // ParseFromRawParams .
@@ -67,7 +67,7 @@ func (n *NodeResourceInfo) Validate() error {
 		return ErrInvalidCapacity
 	}
 	if n.Usage == nil {
-		n.Usage = &NodeResource{Volumes: VolumeMap{}, Storage: 0}
+		n.Usage = &NodeResource{Volumes: Volumes{}, Disks: Disks{}, Storage: 0}
 		for device := range n.Capacity.Volumes {
 			n.Usage.Volumes[device] = 0
 		}
@@ -174,10 +174,10 @@ func (n *NodeResourceInfo) validateStorage() error {
 
 // NodeResourceRequest includes all possible fields passed by eru-core for editing node, it not parsed!
 type NodeResourceRequest struct {
-	Volumes VolumeMap `json:"volumes"`
-	Storage int64     `json:"storage"`
-	Disks   Disks     `json:"disks"`
-	RMDisks []string  `json:"rm_disks"`
+	Volumes Volumes  `json:"volumes"`
+	Storage int64    `json:"storage"`
+	Disks   Disks    `json:"disks"`
+	RMDisks []string `json:"rm_disks"`
 
 	RawParams coretypes.RawParams `json:"-"`
 }
@@ -186,7 +186,7 @@ type NodeResourceRequest struct {
 func (n *NodeResourceRequest) Parse(rawParams coretypes.RawParams) (err error) {
 	n.RawParams = rawParams
 
-	volumes := VolumeMap{}
+	volumes := Volumes{}
 	for _, volume := range n.RawParams.StringSlice("volumes") {
 		parts := strings.Split(volume, ":")
 		if len(parts) != 2 {
@@ -207,15 +207,15 @@ func (n *NodeResourceRequest) Parse(rawParams coretypes.RawParams) (err error) {
 
 	n.Storage += n.Volumes.Total()
 
-	if n.RawParams.IsSet("disks") {
-		for _, rawDiskStr := range n.RawParams.StringSlice("disks") {
-			disk := &Disk{}
-			if err = disk.Parse(rawDiskStr); err != nil {
-				return errors.Wrapf(ErrInvalidDisk, "wrong disk format: %+v, %+v", rawDiskStr, err)
-			}
-			n.Disks = append(n.Disks, disk)
+	disks := Disks{}
+	for _, rawDiskStr := range n.RawParams.StringSlice("disks") {
+		disk := &Disk{}
+		if err = disk.Parse(rawDiskStr); err != nil {
+			return errors.Wrapf(ErrInvalidDisk, "wrong disk format: %+v, %+v", rawDiskStr, err)
 		}
+		disks = append(disks, disk)
 	}
+	n.Disks = disks
 
 	if n.RawParams.IsSet("rm-disks") {
 		n.RMDisks = strings.Split(n.RawParams.String("rm-disks"), ",")

@@ -213,14 +213,14 @@ func (p Plugin) GetMostIdleNode(ctx context.Context, nodenames []string) (*coret
 }
 
 func (p Plugin) FixNodeResource(ctx context.Context, nodename string, workloadsResource []plugintypes.WorkloadResource) (coretypes.RawParams, error) {
-	nodeResourceInfo, totalVolumeMap, totalDiskUsage, totalStorageUsage, diffs, err := p.getNodeResourceInfo(ctx, nodename, workloadsResource)
+	nodeResourceInfo, totalVolumes, totalDiskUsage, totalStorageUsage, diffs, err := p.getNodeResourceInfo(ctx, nodename, workloadsResource)
 	if err != nil {
 		return nil, err
 	}
 
 	if len(diffs) != 0 {
 		nodeResourceInfo.Usage = &storagetypes.NodeResource{
-			Volumes: totalVolumeMap,
+			Volumes: totalVolumes,
 			Disks:   totalDiskUsage,
 			Storage: totalStorageUsage,
 		}
@@ -239,7 +239,7 @@ func (p Plugin) FixNodeResource(ctx context.Context, nodename string, workloadsR
 
 func (p Plugin) getNodeResourceInfo(ctx context.Context, nodename string, workloadsResource []plugintypes.WorkloadResource) (
 	*storagetypes.NodeResourceInfo,
-	storagetypes.VolumeMap, storagetypes.Disks, int64,
+	storagetypes.Volumes, storagetypes.Disks, int64,
 	[]string, error,
 ) {
 	logger := log.WithFunc("resource.storage.getNodeResourceInfo").WithField("node", nodename)
@@ -249,7 +249,7 @@ func (p Plugin) getNodeResourceInfo(ctx context.Context, nodename string, worklo
 		return nil, nil, nil, 0, nil, err
 	}
 
-	totalVolumeMap := storagetypes.VolumeMap{}
+	totalVolumes := storagetypes.Volumes{}
 	totalDiskUsage := storagetypes.Disks{}
 	totalStorageUsage := int64(0)
 	for _, workloadResource := range workloadsResource {
@@ -259,7 +259,7 @@ func (p Plugin) getNodeResourceInfo(ctx context.Context, nodename string, worklo
 			return nil, nil, nil, 0, nil, err
 		}
 		for _, volumeMap := range workloadUsage.VolumePlanRequest {
-			totalVolumeMap.Add(volumeMap)
+			totalVolumes.Add(volumeMap)
 		}
 		totalStorageUsage += workloadUsage.StorageRequest
 		totalDiskUsage.Add(workloadUsage.DisksRequest.RemoveMounts())
@@ -271,11 +271,11 @@ func (p Plugin) getNodeResourceInfo(ctx context.Context, nodename string, worklo
 		diffs = append(diffs, fmt.Sprintf("node.Storage != sum(workload.Storage): %+v != %+v", nodeResourceInfo.Usage.Storage, totalStorageUsage))
 	}
 	for volume, size := range nodeResourceInfo.Usage.Volumes {
-		if totalVolumeMap[volume] != size {
-			diffs = append(diffs, fmt.Sprintf("node.Volumes[%s] != sum(workload.Volumes[%s]): %+v != %+v", volume, volume, size, totalVolumeMap[volume]))
+		if totalVolumes[volume] != size {
+			diffs = append(diffs, fmt.Sprintf("node.Volumes[%s] != sum(workload.Volumes[%s]): %+v != %+v", volume, volume, size, totalVolumes[volume]))
 		}
 	}
-	for volume, size := range totalVolumeMap {
+	for volume, size := range totalVolumes {
 		if vol, ok := nodeResourceInfo.Usage.Volumes[volume]; !ok && vol != size {
 			diffs = append(diffs, fmt.Sprintf("node.Volumes[%s] != sum(workload.Volumes[%s]): %+v != %+v", volume, volume, nodeResourceInfo.Usage.Volumes[volume], size))
 		}
@@ -300,7 +300,7 @@ func (p Plugin) getNodeResourceInfo(ctx context.Context, nodename string, worklo
 		}
 	}
 
-	return nodeResourceInfo, totalVolumeMap, totalDiskUsage, totalStorageUsage, diffs, nil
+	return nodeResourceInfo, totalVolumes, totalDiskUsage, totalStorageUsage, diffs, nil
 }
 
 func (p Plugin) doGetNodeResourceInfo(ctx context.Context, nodename string) (*storagetypes.NodeResourceInfo, error) {

@@ -110,7 +110,7 @@ func TestSetNodeResourceCapacity(t *testing.T) {
 	}
 
 	nodeResource := plugintypes.NodeResource{
-		"volumes": types.VolumeMap{"/data4": units.TiB},
+		"volumes": types.Volumes{"/data4": units.TiB},
 		"storage": units.TiB,
 	}
 
@@ -190,12 +190,12 @@ func TestSetNodeResourceInfo(t *testing.T) {
 	node := nodes[0]
 
 	capacity := plugintypes.NodeResource{
-		"volumes": types.VolumeMap{"/data4": units.TiB},
+		"volumes": types.Volumes{"/data4": units.TiB},
 		"storage": units.TiB,
 	}
 
 	usage := plugintypes.NodeResource{
-		"volumes": types.VolumeMap{"/data3": units.TiB},
+		"volumes": types.Volumes{"/data3": units.TiB},
 		"storage": 4 * units.TiB,
 	}
 
@@ -237,7 +237,7 @@ func TestSetNodeResourceUsage(t *testing.T) {
 	}
 
 	nodeResource := plugintypes.NodeResource{
-		"volumes": types.VolumeMap{"/data4": units.TiB},
+		"volumes": types.Volumes{"/data4": units.TiB},
 		"storage": units.TiB,
 	}
 

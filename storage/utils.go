@@ -17,17 +17,17 @@ func (p Plugin) toIOPSOptions(disks types.Disks) map[string]string {
 func getVolumePlanLimit(volumeRequest types.VolumeBindings, volumeLimit types.VolumeBindings, volumePlan types.VolumePlan) types.VolumePlan {
 	volumePlanLimit := types.VolumePlan{}
 
-	volumeBindingToVolumeMap := map[[3]string]types.VolumeMap{}
+	volumeBindingToVolumes := map[[3]string]types.Volumes{}
 	for binding, volumeMap := range volumePlan {
-		volumeBindingToVolumeMap[binding.GetMapKey()] = volumeMap
+		volumeBindingToVolumes[binding.GetMapKey()] = volumeMap
 	}
 
 	for index, binding := range volumeLimit {
 		if !binding.RequireSchedule() {
 			continue
 		}
-		if volumeMap, ok := volumeBindingToVolumeMap[binding.GetMapKey()]; ok {
-			volumePlanLimit[binding] = types.VolumeMap{volumeMap.GetDevice(): volumeMap.GetSize() + binding.SizeInBytes - volumeRequest[index].SizeInBytes}
+		if volumeMap, ok := volumeBindingToVolumes[binding.GetMapKey()]; ok {
+			volumePlanLimit[binding] = types.Volumes{volumeMap.GetDevice(): volumeMap.GetSize() + binding.SizeInBytes - volumeRequest[index].SizeInBytes}
 		}
 	}
 	return volumePlanLimit
@@ -66,12 +66,12 @@ func getDisksLimit(volumeLimit types.VolumeBindings, volumePlanLimit types.Volum
 }
 
 func getDeltaWorkloadResourceArgs(originResource, targetWorkloadResource *types.WorkloadResource) *types.WorkloadResource {
-	deltaVolumeMap := types.VolumeMap{}
+	deltaVolumes := types.Volumes{}
 	for _, volumeMap := range targetWorkloadResource.VolumePlanRequest {
-		deltaVolumeMap.Add(volumeMap)
+		deltaVolumes.Add(volumeMap)
 	}
 	for _, volumeMap := range originResource.VolumePlanRequest {
-		deltaVolumeMap.Sub(volumeMap)
+		deltaVolumes.Sub(volumeMap)
 	}
 
 	deltaDisks := targetWorkloadResource.DisksRequest.DeepCopy()
@@ -83,7 +83,7 @@ func getDeltaWorkloadResourceArgs(originResource, targetWorkloadResource *types.
 			Destination: "fake-destination",
 			Flags:       "fake-flags",
 			SizeInBytes: 0,
-		}: deltaVolumeMap},
+		}: deltaVolumes},
 		StorageRequest: targetWorkloadResource.StorageRequest - originResource.StorageRequest,
 		DisksRequest:   deltaDisks,
 	}

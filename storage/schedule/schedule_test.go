@@ -15,7 +15,7 @@ var maxDeployCount = 1000
 func generateResourceInfo() *types.NodeResourceInfo {
 	return &types.NodeResourceInfo{
 		Capacity: &types.NodeResource{
-			Volumes: types.VolumeMap{
+			Volumes: types.Volumes{
 				"/data0": units.TiB,
 				"/data1": units.TiB,
 				"/data2": units.TiB,
@@ -41,7 +41,7 @@ func generateResourceInfo() *types.NodeResourceInfo {
 			},
 		},
 		Usage: &types.NodeResource{
-			Volumes: types.VolumeMap{
+			Volumes: types.Volumes{
 				"/data0": 200 * units.GiB,
 				"/data1": 300 * units.GiB,
 			},
@@ -70,10 +70,10 @@ func generateResourceInfo() *types.NodeResourceInfo {
 func generateEmptyResourceInfo() *types.NodeResourceInfo {
 	return &types.NodeResourceInfo{
 		Capacity: &types.NodeResource{
-			Volumes: types.VolumeMap{},
+			Volumes: types.Volumes{},
 		},
 		Usage: &types.NodeResource{
-			Volumes: types.VolumeMap{},
+			Volumes: types.Volumes{},
 		},
 	}
 }

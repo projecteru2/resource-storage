@@ -221,7 +221,7 @@ func (vbs VolumeBindings) TotalSize() (total int64) {
 func (vbs VolumeBindings) ApplyPlan(plan VolumePlan) (res VolumeBindings) {
 	for _, vb := range vbs {
 		newVb := vb.DeepCopy()
-		if vmap, _ := plan.GetVolumeMap(vb); vmap != nil {
+		if vmap, _ := plan.GetVolumes(vb); vmap != nil {
 			newVb.Source = vmap.GetDevice()
 			if vmap.GetSize() > newVb.SizeInBytes {
 				newVb.SizeInBytes = vmap.GetSize()
@@ -266,12 +266,12 @@ func MergeVolumeBindings(vbs1 VolumeBindings, vbs2 ...VolumeBindings) (vbs Volum
 	return vbs
 }
 
-// VolumeMap .
-type VolumeMap map[string]int64
+// Volumes .
+type Volumes map[string]int64
 
 // DeepCopy .
-func (v VolumeMap) DeepCopy() VolumeMap {
-	res := VolumeMap{}
+func (v Volumes) DeepCopy() Volumes {
+	res := Volumes{}
 	for key, value := range v {
 		res[key] = value
 	}
@@ -279,21 +279,21 @@ func (v VolumeMap) DeepCopy() VolumeMap {
 }
 
 // Add .
-func (v VolumeMap) Add(v1 VolumeMap) {
+func (v Volumes) Add(v1 Volumes) {
 	for key, value := range v1 {
 		v[key] += value
 	}
 }
 
 // Sub .
-func (v VolumeMap) Sub(v1 VolumeMap) {
+func (v Volumes) Sub(v1 Volumes) {
 	for key, value := range v1 {
 		v[key] -= value
 	}
 }
 
 // GetDevice returns the first device
-func (v VolumeMap) GetDevice() string {
+func (v Volumes) GetDevice() string {
 	for key := range v {
 		return key
 	}
@@ -301,7 +301,7 @@ func (v VolumeMap) GetDevice() string {
 }
 
 // GetSize returns the first size
-func (v VolumeMap) GetSize() int64 {
+func (v Volumes) GetSize() int64 {
 	for _, size := range v {
 		return size
 	}
@@ -309,7 +309,7 @@ func (v VolumeMap) GetSize() int64 {
 }
 
 // Total .
-func (v VolumeMap) Total() int64 {
+func (v Volumes) Total() int64 {
 	res := int64(0)
 	for _, size := range v {
 		res += size
@@ -317,15 +317,15 @@ func (v VolumeMap) Total() int64 {
 	return res
 }
 
-// VolumePlan is map from volume string to volumeMap: {"AUTO:/data:rw:100": VolumeMap{"/sda1": 100}}
-type VolumePlan map[*VolumeBinding]VolumeMap
+// VolumePlan is map from volume string to volumeMap: {"AUTO:/data:rw:100": Volumes{"/sda1": 100}}
+type VolumePlan map[*VolumeBinding]Volumes
 
 // UnmarshalJSON .
 func (p *VolumePlan) UnmarshalJSON(b []byte) (err error) {
 	if *p == nil {
 		*p = VolumePlan{}
 	}
-	plan := map[string]VolumeMap{}
+	plan := map[string]Volumes{}
 	if err = json.Unmarshal(b, &plan); err != nil {
 		return err
 	}
@@ -341,7 +341,7 @@ func (p *VolumePlan) UnmarshalJSON(b []byte) (err error) {
 
 // MarshalJSON .
 func (p VolumePlan) MarshalJSON() ([]byte, error) {
-	plan := map[string]VolumeMap{}
+	plan := map[string]Volumes{}
 	for vb, vmap := range p {
 		plan[vb.ToString(false)] = vmap
 	}
@@ -361,10 +361,10 @@ func (p VolumePlan) String() string {
 // Merge .
 func (p VolumePlan) Merge(p2 VolumePlan) {
 	for vb, vm := range p2 {
-		if oldVM, oldVB := p.GetVolumeMap(vb); oldVB != nil {
+		if oldVM, oldVB := p.GetVolumes(vb); oldVB != nil {
 			delete(p, oldVB)
 			vm[vm.GetDevice()] += oldVM.GetSize()
-			vm = VolumeMap{vm.GetDevice(): vm.GetSize() + oldVM.GetSize()}
+			vm = Volumes{vm.GetDevice(): vm.GetSize() + oldVM.GetSize()}
 			vb = &VolumeBinding{
 				Source:      vb.Source,
 				Destination: vb.Destination,
@@ -380,8 +380,8 @@ func (p VolumePlan) Merge(p2 VolumePlan) {
 	}
 }
 
-// GetVolumeMap looks up VolumeMap according to volume destination directory
-func (p VolumePlan) GetVolumeMap(vb *VolumeBinding) (volMap VolumeMap, volume *VolumeBinding) {
+// GetVolumes looks up Volumes according to volume destination directory
+func (p VolumePlan) GetVolumes(vb *VolumeBinding) (volMap Volumes, volume *VolumeBinding) {
 	for volume, volMap := range p {
 		if vb.Destination == volume.Destination {
 			return volMap, volume

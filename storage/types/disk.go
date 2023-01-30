@@ -24,7 +24,7 @@ func (d *Disk) String() string {
 	return fmt.Sprintf("%+v:%+v:%+v:%+v:%+v:%+v", d.Device, strings.Join(d.Mounts, ","), d.ReadIOPS, d.WriteIOPS, d.ReadBPS, d.WriteBPS)
 }
 
-// ParseFromString .
+// Parse .
 func (d *Disk) Parse(s string) (err error) {
 	parts := strings.Split(s, ":")
 	if len(parts) != 6 {
