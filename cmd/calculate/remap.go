@@ -2,7 +2,7 @@ package calculate
 
 import (
 	"github.com/mitchellh/mapstructure"
-	"github.com/projecteru2/core/resource3/plugins/binary"
+	"github.com/projecteru2/core/resource/plugins/binary"
 	"github.com/projecteru2/core/types"
 	coretypes "github.com/projecteru2/core/types"
 	"github.com/projecteru2/resource-storage/cmd"
@@ -25,9 +25,9 @@ func calculateRemap(c *cli.Context) error {
 			return nil, types.ErrEmptyNodeName
 		}
 
-		workloadsResource := map[string]*coretypes.RawParams{}
-		for ID, data := range *in.RawParams("workloads_resource") {
-			workloadsResource[ID] = &coretypes.RawParams{}
+		workloadsResource := map[string]coretypes.RawParams{}
+		for ID, data := range in.RawParams("workloads_resource") {
+			workloadsResource[ID] = coretypes.RawParams{}
 			_ = mapstructure.Decode(data, workloadsResource[ID])
 		}
 		// NO NEED REMAP VOLUME

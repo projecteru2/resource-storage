@@ -26,7 +26,7 @@ type WorkloadResource struct {
 }
 
 // ParseFromRawParams .
-func (w *WorkloadResource) Parse(rawParams *coretypes.RawParams) error {
+func (w *WorkloadResource) Parse(rawParams coretypes.RawParams) error {
 	return mapstructure.Decode(rawParams, w)
 }
 
@@ -52,7 +52,7 @@ func (w *WorkloadResourceRequest) Validate() error {
 }
 
 // ParseFromRawParams .
-func (w *WorkloadResourceRequest) Parse(rawParams *coretypes.RawParams) (err error) {
+func (w *WorkloadResourceRequest) Parse(rawParams coretypes.RawParams) (err error) {
 	if w.VolumesRequest, err = NewVolumeBindings(rawParams.OneOfStringSlice("volumes-request", "volume-request", "volumes-request")); err != nil {
 		return err
 	}

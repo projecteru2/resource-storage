@@ -6,7 +6,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	enginetypes "github.com/projecteru2/core/engine/types"
-	"github.com/projecteru2/core/resource3/plugins/binary"
+	"github.com/projecteru2/core/resource/plugins/binary"
 	"github.com/projecteru2/core/types"
 	"github.com/urfave/cli/v2"
 )

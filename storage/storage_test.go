@@ -7,7 +7,7 @@ import (
 
 	"github.com/docker/go-units"
 	enginetypes "github.com/projecteru2/core/engine/types"
-	plugintypes "github.com/projecteru2/core/resource3/plugins/types"
+	plugintypes "github.com/projecteru2/core/resource/plugins/types"
 	coretypes "github.com/projecteru2/core/types"
 	"github.com/stretchr/testify/assert"
 )
@@ -53,10 +53,10 @@ func generateNodes(
 	return names
 }
 
-func generateNodeResourceRequests(t *testing.T, nums int, vols []string, index int) map[string]*plugintypes.NodeResourceRequest {
-	infos := map[string]*plugintypes.NodeResourceRequest{}
+func generateNodeResourceRequests(t *testing.T, nums int, vols []string, index int) map[string]plugintypes.NodeResourceRequest {
+	infos := map[string]plugintypes.NodeResourceRequest{}
 	for i := index; i < index+nums; i++ {
-		info := &plugintypes.NodeResourceRequest{
+		info := plugintypes.NodeResourceRequest{
 			"volumes": vols,
 		}
 		infos[fmt.Sprintf("test%v", i)] = info

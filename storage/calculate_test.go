@@ -7,7 +7,7 @@ import (
 
 	"github.com/docker/go-units"
 	"github.com/mitchellh/mapstructure"
-	plugintypes "github.com/projecteru2/core/resource3/plugins/types"
+	plugintypes "github.com/projecteru2/core/resource/plugins/types"
 	coretypes "github.com/projecteru2/core/types"
 	"github.com/projecteru2/resource-storage/storage/types"
 	"github.com/sanity-io/litter"
@@ -22,34 +22,34 @@ func TestCalculateDeploy(t *testing.T) {
 	node := nodes[0]
 
 	// invalid resource opt
-	req := &plugintypes.WorkloadResourceRequest{"storage": "-1"}
+	req := plugintypes.WorkloadResourceRequest{"storage": "-1"}
 	_, err := st.CalculateDeploy(ctx, node, 10, req)
 	assert.ErrorIs(t, err, types.ErrInvalidStorage)
 
 	// invalid node
-	req = &plugintypes.WorkloadResourceRequest{
+	req = plugintypes.WorkloadResourceRequest{
 		"volumes": []string{"AUTO:/dir0:rwm:1G"},
 	}
 	_, err = st.CalculateDeploy(ctx, "no node", 10, req)
 	assert.ErrorIs(t, err, coretypes.ErrInvaildCount)
 
 	// storage is not enough
-	req = &plugintypes.WorkloadResourceRequest{
+	req = plugintypes.WorkloadResourceRequest{
 		"volumes": []string{"AUTO:/dir0:rwm:10T"},
 	}
 	_, err = st.CalculateDeploy(ctx, node, 10, req)
 	assert.ErrorIs(t, err, coretypes.ErrInsufficientResource)
 
 	// normal case
-	req = &plugintypes.WorkloadResourceRequest{
+	req = plugintypes.WorkloadResourceRequest{
 		"storage": fmt.Sprintf("%v", units.GiB),
 	}
 	d, err := st.CalculateDeploy(ctx, node, 10, req)
 	assert.NoError(t, err)
-	assert.NotNil(t, (*d)["engines_params"])
+	assert.NotNil(t, d["engines_params"])
 
 	// volume
-	req = &plugintypes.WorkloadResourceRequest{
+	req = plugintypes.WorkloadResourceRequest{
 		"volumes": []string{
 			"AUTO:/dir0:rwm:1T",
 		},
@@ -96,20 +96,20 @@ func TestCalculateRealloc(t *testing.T) {
 		StorageRequest:    0,
 		StorageLimit:      0,
 	}
-	resource := &plugintypes.WorkloadResource{}
-	assert.NoError(t, mapstructure.Decode(wrkResource, resource))
+	resource := plugintypes.WorkloadResource{}
+	assert.NoError(t, mapstructure.Decode(wrkResource, &resource))
 
-	_, err = st.SetNodeResourceUsage(ctx, node, nil, nil, []*plugintypes.WorkloadResource{resource}, true, true)
+	_, err = st.SetNodeResourceUsage(ctx, node, nil, nil, []plugintypes.WorkloadResource{resource}, true, true)
 	assert.NoError(t, err)
 
-	req := &plugintypes.WorkloadResourceRequest{}
+	req := plugintypes.WorkloadResourceRequest{}
 
 	// non-existent node
 	_, err = st.CalculateRealloc(ctx, "no node", resource, req)
 	assert.ErrorIs(t, err, coretypes.ErrInvaildCount)
 
 	// invalid req
-	req = &plugintypes.WorkloadResourceRequest{
+	req = plugintypes.WorkloadResourceRequest{
 		"volume-request":  []string{"AUTO:/dir0:rw:100GiB", "AUTO:/dir1:mrw:100GiB", "AUTO:/dir2:rw:0"},
 		"storage-request": "-1",
 		"storage-limit":   "-1",
@@ -118,7 +118,7 @@ func TestCalculateRealloc(t *testing.T) {
 	assert.ErrorIs(t, err, types.ErrInvalidStorage)
 
 	// insufficient storage
-	req = &plugintypes.WorkloadResourceRequest{
+	req = plugintypes.WorkloadResourceRequest{
 		"volume-request":  []string{"AUTO:/dir1:mrw:100GiB"},
 		"volume-limit":    []string{"AUTO:/dir1:mrw:100GiB"},
 		"storage-request": fmt.Sprintf("%v", 4*units.TiB),
@@ -128,7 +128,7 @@ func TestCalculateRealloc(t *testing.T) {
 	assert.ErrorIs(t, err, coretypes.ErrInsufficientResource)
 
 	// insufficient volume
-	req = &plugintypes.WorkloadResourceRequest{
+	req = plugintypes.WorkloadResourceRequest{
 		"volume-request": []string{"AUTO:/dir1:mrw:1TiB"},
 		"volume-limit":   []string{"AUTO:/dir1:mrw:1TiB"},
 	}
@@ -136,7 +136,7 @@ func TestCalculateRealloc(t *testing.T) {
 	assert.ErrorIs(t, err, coretypes.ErrInsufficientResource)
 
 	// normal case
-	req = &plugintypes.WorkloadResourceRequest{
+	req = plugintypes.WorkloadResourceRequest{
 		"volume-request":  []string{"AUTO:/dir1:mrw:100GiB"},
 		"volume-limit":    []string{"AUTO:/dir1:mrw:100GiB"},
 		"storage-request": fmt.Sprintf("%v", units.GiB),
@@ -144,11 +144,11 @@ func TestCalculateRealloc(t *testing.T) {
 	}
 	d, err := st.CalculateRealloc(ctx, node, resource, req)
 	assert.NoError(t, err)
-	v, ok := (*d)["engine_params"].(*types.EngineParams)
+	v, ok := d["engine_params"].(*types.EngineParams)
 	assert.True(t, ok)
 	assert.False(t, v.VolumeChanged)
 
-	v2, ok := (*d)["workload_resource"].(*types.WorkloadResource)
+	v2, ok := d["workload_resource"].(*types.WorkloadResource)
 	assert.True(t, ok)
 	assert.Len(t, v2.VolumePlanRequest, 3)
 	plan = types.VolumePlan{}
@@ -168,16 +168,16 @@ func TestCalculateRealloc(t *testing.T) {
 	assert.Equal(t, litter.Sdump(plan), litter.Sdump(v2.VolumePlanRequest))
 
 	// no request
-	req = &plugintypes.WorkloadResourceRequest{
+	req = plugintypes.WorkloadResourceRequest{
 		"storage-request": fmt.Sprintf("%v", units.GiB),
 		"storage-limit":   fmt.Sprintf("%v", units.GiB),
 	}
 	d, err = st.CalculateRealloc(ctx, node, resource, req)
 	assert.NoError(t, err)
-	v, ok = (*d)["engine_params"].(*types.EngineParams)
+	v, ok = d["engine_params"].(*types.EngineParams)
 	assert.True(t, ok)
 	assert.False(t, v.VolumeChanged)
-	v2, ok = (*d)["workload_resource"].(*types.WorkloadResource)
+	v2, ok = d["workload_resource"].(*types.WorkloadResource)
 	assert.True(t, ok)
 	assert.Len(t, v2.VolumePlanRequest, 3)
 	plan = types.VolumePlan{}
@@ -205,5 +205,5 @@ func TestCalculateRemap(t *testing.T) {
 	node := nodes[0]
 	d, err := st.CalculateRemap(ctx, node, nil)
 	assert.NoError(t, err)
-	assert.Nil(t, (*d)["engine_params_map"])
+	assert.Nil(t, d["engine_params_map"])
 }
