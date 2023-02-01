@@ -7,6 +7,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	enginetypes "github.com/projecteru2/core/engine/types"
 	"github.com/projecteru2/core/resource/plugins/binary"
+	resourcetypes "github.com/projecteru2/core/resource/types"
 	"github.com/projecteru2/core/types"
 	"github.com/urfave/cli/v2"
 )
@@ -28,7 +29,7 @@ func RemoveNode() *cli.Command {
 }
 
 func addNode(c *cli.Context) error {
-	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
+	return cmd.Serve(c, func(s *storage.Plugin, in resourcetypes.RawParams) (interface{}, error) {
 		nodename := in.String("nodename")
 		if nodename == "" {
 			return nil, types.ErrEmptyNodeName
@@ -44,7 +45,7 @@ func addNode(c *cli.Context) error {
 }
 
 func removeNode(c *cli.Context) error {
-	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
+	return cmd.Serve(c, func(s *storage.Plugin, in resourcetypes.RawParams) (interface{}, error) {
 		nodename := in.String("nodename")
 		if nodename == "" {
 			return nil, types.ErrEmptyNodeName

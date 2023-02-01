@@ -2,6 +2,7 @@ package node
 
 import (
 	"github.com/projecteru2/core/resource/plugins/binary"
+	resourcetypes "github.com/projecteru2/core/resource/types"
 	"github.com/projecteru2/core/types"
 	"github.com/projecteru2/resource-storage/cmd"
 	"github.com/projecteru2/resource-storage/storage"
@@ -17,7 +18,7 @@ func GetMostIdleNode() *cli.Command {
 }
 
 func getMostIdleNode(c *cli.Context) error {
-	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
+	return cmd.Serve(c, func(s *storage.Plugin, in resourcetypes.RawParams) (interface{}, error) {
 		nodenames := in.StringSlice("nodenames")
 		if len(nodenames) == 0 {
 			return nil, types.ErrEmptyNodeName

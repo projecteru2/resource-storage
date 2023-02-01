@@ -3,8 +3,8 @@ package calculate
 import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/projecteru2/core/resource/plugins/binary"
+	resourcetypes "github.com/projecteru2/core/resource/types"
 	"github.com/projecteru2/core/types"
-	coretypes "github.com/projecteru2/core/types"
 	"github.com/projecteru2/resource-storage/cmd"
 	"github.com/projecteru2/resource-storage/storage"
 	"github.com/urfave/cli/v2"
@@ -19,15 +19,15 @@ func CalculateRemap() *cli.Command {
 }
 
 func calculateRemap(c *cli.Context) error {
-	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
+	return cmd.Serve(c, func(s *storage.Plugin, in resourcetypes.RawParams) (interface{}, error) {
 		nodename := in.String("nodename")
 		if nodename == "" {
 			return nil, types.ErrEmptyNodeName
 		}
 
-		workloadsResource := map[string]coretypes.RawParams{}
+		workloadsResource := map[string]resourcetypes.RawParams{}
 		for ID, data := range in.RawParams("workloads_resource") {
-			workloadsResource[ID] = coretypes.RawParams{}
+			workloadsResource[ID] = resourcetypes.RawParams{}
 			_ = mapstructure.Decode(data, workloadsResource[ID])
 		}
 		// NO NEED REMAP VOLUME

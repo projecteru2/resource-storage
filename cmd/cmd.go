@@ -6,10 +6,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/projecteru2/resource-storage/storage"
-
-	"github.com/projecteru2/core/types"
+	resourcetypes "github.com/projecteru2/core/resource/types"
 	"github.com/projecteru2/core/utils"
+	"github.com/projecteru2/resource-storage/storage"
 	"github.com/urfave/cli/v2"
 )
 
@@ -18,7 +17,7 @@ var (
 	EmbeddedStorage bool
 )
 
-func Serve(c *cli.Context, f func(s *storage.Plugin, in *types.RawParams) (interface{}, error)) error {
+func Serve(c *cli.Context, f func(s *storage.Plugin, in resourcetypes.RawParams) (interface{}, error)) error {
 	config, err := utils.LoadConfig(ConfigPath)
 	if err != nil {
 		return cli.Exit(err, 128)
@@ -34,8 +33,8 @@ func Serve(c *cli.Context, f func(s *storage.Plugin, in *types.RawParams) (inter
 		return cli.Exit(err, 128)
 	}
 
-	in := &types.RawParams{}
-	if err := json.NewDecoder(os.Stdin).Decode(in); err != nil {
+	in := resourcetypes.RawParams{}
+	if err := json.NewDecoder(os.Stdin).Decode(&in); err != nil {
 		return cli.Exit(err, 128)
 	}
 

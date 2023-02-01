@@ -6,7 +6,7 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/mitchellh/mapstructure"
-	coretypes "github.com/projecteru2/core/types"
+	resourcetypes "github.com/projecteru2/core/resource/types"
 	coreutils "github.com/projecteru2/core/utils"
 )
 
@@ -18,7 +18,7 @@ type NodeResource struct {
 }
 
 // ParseFromRawParams .
-func (n *NodeResource) Parse(rawParams coretypes.RawParams) error {
+func (n *NodeResource) Parse(rawParams resourcetypes.RawParams) error {
 	return mapstructure.Decode(rawParams, n)
 }
 
@@ -179,11 +179,11 @@ type NodeResourceRequest struct {
 	Disks   Disks    `json:"disks"`
 	RMDisks []string `json:"rm_disks"`
 
-	RawParams coretypes.RawParams `json:"-"`
+	RawParams resourcetypes.RawParams `json:"-"`
 }
 
 // Parse .
-func (n *NodeResourceRequest) Parse(rawParams coretypes.RawParams) (err error) {
+func (n *NodeResourceRequest) Parse(rawParams resourcetypes.RawParams) (err error) {
 	n.RawParams = rawParams
 
 	volumes := Volumes{}

@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 
+	resourcetypes "github.com/projecteru2/core/resource/types"
 	"github.com/projecteru2/resource-storage/storage/schedule"
 	storagetypes "github.com/projecteru2/resource-storage/storage/types"
 
@@ -14,7 +15,7 @@ import (
 	"github.com/sanity-io/litter"
 )
 
-func (p Plugin) CalculateDeploy(ctx context.Context, nodename string, deployCount int, resourceRequest plugintypes.WorkloadResourceRequest) (coretypes.RawParams, error) {
+func (p Plugin) CalculateDeploy(ctx context.Context, nodename string, deployCount int, resourceRequest plugintypes.WorkloadResourceRequest) (resourcetypes.RawParams, error) {
 	logger := log.WithFunc("resource.storage.CalculateDeploy").WithField("node", nodename)
 	req := &storagetypes.WorkloadResourceRequest{}
 	if err := req.Parse(resourceRequest); err != nil {
@@ -36,13 +37,13 @@ func (p Plugin) CalculateDeploy(ctx context.Context, nodename string, deployCoun
 		return nil, err
 	}
 
-	return coretypes.RawParams{
+	return resourcetypes.RawParams{
 		"engines_params":     enginesParams,
 		"workloads_resource": workloadsResource,
 	}, nil
 }
 
-func (p Plugin) CalculateRealloc(ctx context.Context, nodename string, resource plugintypes.WorkloadResource, resourceRequest plugintypes.WorkloadResourceRequest) (coretypes.RawParams, error) {
+func (p Plugin) CalculateRealloc(ctx context.Context, nodename string, resource plugintypes.WorkloadResource, resourceRequest plugintypes.WorkloadResourceRequest) (resourcetypes.RawParams, error) {
 	logger := log.WithFunc("resource.storage.CalculateRealloc").WithField("node", nodename)
 	req := &storagetypes.WorkloadResourceRequest{}
 	if err := req.Parse(resourceRequest); err != nil {
@@ -124,16 +125,16 @@ func (p Plugin) CalculateRealloc(ctx context.Context, nodename string, resource 
 
 	deltaWorkloadResource := getDeltaWorkloadResourceArgs(originResource, targetWorkloadResource)
 
-	return coretypes.RawParams{
+	return resourcetypes.RawParams{
 		"engine_params":     engineParams,
 		"delta_resource":    deltaWorkloadResource,
 		"workload_resource": targetWorkloadResource,
 	}, nil
 }
 
-func (p Plugin) CalculateRemap(ctx context.Context, nodename string, workloadsResource map[string]plugintypes.WorkloadResource) (coretypes.RawParams, error) {
+func (p Plugin) CalculateRemap(ctx context.Context, nodename string, workloadsResource map[string]plugintypes.WorkloadResource) (resourcetypes.RawParams, error) {
 	// NO NEED REMAP VOLUME
-	return coretypes.RawParams{
+	return resourcetypes.RawParams{
 		"engine_params_map": nil,
 	}, nil
 }

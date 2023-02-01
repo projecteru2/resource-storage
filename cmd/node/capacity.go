@@ -2,6 +2,7 @@ package node
 
 import (
 	"github.com/projecteru2/core/resource/plugins/binary"
+	resourcetypes "github.com/projecteru2/core/resource/types"
 	"github.com/projecteru2/core/types"
 	"github.com/projecteru2/resource-storage/cmd"
 	"github.com/projecteru2/resource-storage/storage"
@@ -17,7 +18,7 @@ func GetNodesDeployCapacity() *cli.Command {
 }
 
 func getNodesDeployCapacity(c *cli.Context) error {
-	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
+	return cmd.Serve(c, func(s *storage.Plugin, in resourcetypes.RawParams) (interface{}, error) {
 		nodenames := in.StringSlice("nodenames")
 		if len(nodenames) == 0 {
 			return nil, types.ErrEmptyNodeName
@@ -37,7 +38,7 @@ func SetNodeResourceCapacity() *cli.Command {
 }
 
 func setNodeResourceCapacity(c *cli.Context) error {
-	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
+	return cmd.Serve(c, func(s *storage.Plugin, in resourcetypes.RawParams) (interface{}, error) {
 		nodename := in.String("nodename")
 		if nodename == "" {
 			return nil, types.ErrEmptyNodeName

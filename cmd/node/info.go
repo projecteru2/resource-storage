@@ -2,6 +2,7 @@ package node
 
 import (
 	"github.com/projecteru2/core/resource/plugins/binary"
+	resourcetypes "github.com/projecteru2/core/resource/types"
 	"github.com/projecteru2/core/types"
 	"github.com/projecteru2/resource-storage/cmd"
 	"github.com/projecteru2/resource-storage/storage"
@@ -17,7 +18,7 @@ func GetNodeResourceInfo() *cli.Command {
 }
 
 func getNodeResourceInfo(c *cli.Context) error {
-	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
+	return cmd.Serve(c, func(s *storage.Plugin, in resourcetypes.RawParams) (interface{}, error) {
 		nodename := in.String("nodename")
 		if nodename == "" {
 			return nil, types.ErrEmptyNodeName
@@ -37,7 +38,7 @@ func SetNodeResourceInfo() *cli.Command {
 }
 
 func setNodeResourceInfo(c *cli.Context) error {
-	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
+	return cmd.Serve(c, func(s *storage.Plugin, in resourcetypes.RawParams) (interface{}, error) {
 		nodename := in.String("nodename")
 		if nodename == "" {
 			return nil, types.ErrEmptyNodeName
@@ -59,7 +60,7 @@ func FixNodeResource() *cli.Command {
 }
 
 func fixNodeResource(c *cli.Context) error {
-	return cmd.Serve(c, func(s *storage.Plugin, in *types.RawParams) (interface{}, error) {
+	return cmd.Serve(c, func(s *storage.Plugin, in resourcetypes.RawParams) (interface{}, error) {
 		nodename := in.String("nodename")
 		if nodename == "" {
 			return nil, types.ErrEmptyNodeName

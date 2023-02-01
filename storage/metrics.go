@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/projecteru2/core/types"
+	resourcetypes "github.com/projecteru2/core/resource/types"
 )
 
 // GetMetricsDescription .
-func (p Plugin) GetMetricsDescription(ctx context.Context) ([]*types.RawParams, error) {
-	return []*types.RawParams{
+func (p Plugin) GetMetricsDescription(ctx context.Context) ([]resourcetypes.RawParams, error) {
+	return []resourcetypes.RawParams{
 		{
 			"name":   "storage_used",
 			"help":   "node used storage.",
@@ -27,13 +27,13 @@ func (p Plugin) GetMetricsDescription(ctx context.Context) ([]*types.RawParams, 
 }
 
 // GetMetrics .
-func (p Plugin) GetMetrics(ctx context.Context, podname, nodename string) ([]*types.RawParams, error) {
+func (p Plugin) GetMetrics(ctx context.Context, podname, nodename string) ([]resourcetypes.RawParams, error) {
 	nodeResourceInfo, err := p.doGetNodeResourceInfo(ctx, nodename)
 	if err != nil {
 		return nil, err
 	}
 	safeNodename := strings.ReplaceAll(nodename, ".", "_")
-	return []*types.RawParams{
+	return []resourcetypes.RawParams{
 		{
 			"name":   "storage_used",
 			"labels": []string{podname, nodename},

@@ -6,7 +6,7 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/mitchellh/mapstructure"
-	coretypes "github.com/projecteru2/core/types"
+	resourcetypes "github.com/projecteru2/core/resource/types"
 	coreutils "github.com/projecteru2/core/utils"
 )
 
@@ -26,7 +26,7 @@ type WorkloadResource struct {
 }
 
 // ParseFromRawParams .
-func (w *WorkloadResource) Parse(rawParams coretypes.RawParams) error {
+func (w *WorkloadResource) Parse(rawParams resourcetypes.RawParams) error {
 	return mapstructure.Decode(rawParams, w)
 }
 
@@ -52,7 +52,7 @@ func (w *WorkloadResourceRequest) Validate() error {
 }
 
 // ParseFromRawParams .
-func (w *WorkloadResourceRequest) Parse(rawParams coretypes.RawParams) (err error) {
+func (w *WorkloadResourceRequest) Parse(rawParams resourcetypes.RawParams) (err error) {
 	if w.VolumesRequest, err = NewVolumeBindings(rawParams.OneOfStringSlice("volumes-request", "volume-request", "volumes-request")); err != nil {
 		return err
 	}
