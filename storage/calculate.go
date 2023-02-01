@@ -53,7 +53,6 @@ func (p Plugin) CalculateRealloc(ctx context.Context, nodename string, resource 
 	if err := originResource.Parse(resource); err != nil {
 		return nil, err
 	}
-
 	resourceInfo, err := p.doGetNodeResourceInfo(ctx, nodename)
 	if err != nil {
 		logger.Error(ctx, err, "failed to get resource info of node")
@@ -61,6 +60,9 @@ func (p Plugin) CalculateRealloc(ctx context.Context, nodename string, resource 
 	}
 
 	// check if volume rescheduling is needed
+	if req.VolumesRequest == nil {
+		req.VolumesRequest = req.VolumesLimit
+	}
 	needVolumeReschedule := utils.Any(req.VolumesRequest, func(volume *storagetypes.VolumeBinding) bool { return volume.RequireSchedule() || volume.RequireIOPS() })
 
 	req = &storagetypes.WorkloadResourceRequest{

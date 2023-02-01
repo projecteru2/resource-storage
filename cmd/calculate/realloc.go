@@ -24,7 +24,7 @@ func calculateRealloc(c *cli.Context) error {
 			return nil, types.ErrEmptyNodeName
 		}
 
-		workloadResource := in.RawParams("workload_request")
+		workloadResource := in.RawParams("workload_resource")
 		workloadResourceRequest := in.RawParams("workload_resource_request")
 
 		return s.CalculateRealloc(c.Context, nodename, workloadResource, workloadResourceRequest)
