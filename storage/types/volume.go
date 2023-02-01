@@ -14,14 +14,14 @@ const auto = "AUTO"
 
 // VolumeBinding src:dst[:flags][:size][:read_IOPS:write_IOPS:read_bytes:write_bytes]
 type VolumeBinding struct {
-	Source      string
-	Destination string
-	Flags       string
-	SizeInBytes int64
-	ReadIOPS    int64
-	WriteIOPS   int64
-	ReadBPS     int64
-	WriteBPS    int64
+	Source      string `json:"source" mapstructure:"source"`
+	Destination string `json:"destination" mapstructure:"destination"`
+	Flags       string `json:"flags" mapstructure:"flags"`
+	SizeInBytes int64  `json:"size_in_bytes" mapstructure:"size_in_bytes"`
+	ReadIOPS    int64  `json:"read_iops" mapstructure:"read_iops"`
+	WriteIOPS   int64  `json:"write_iops" mapstructure:"write_iops"`
+	ReadBPS     int64  `json:"read_bps" mapstructure:"read_bps"`
+	WriteBPS    int64  `json:"write_bps" mapstructure:"write_bps"`
 }
 
 // NewVolumeBinding returns pointer of VolumeBinding

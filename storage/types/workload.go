@@ -1,11 +1,11 @@
 package types
 
 import (
+	"encoding/json"
 	"sort"
 	"sync"
 
 	"github.com/cockroachdb/errors"
-	"github.com/mitchellh/mapstructure"
 	resourcetypes "github.com/projecteru2/core/resource/types"
 	coreutils "github.com/projecteru2/core/utils"
 )
@@ -27,7 +27,12 @@ type WorkloadResource struct {
 
 // ParseFromRawParams .
 func (w *WorkloadResource) Parse(rawParams resourcetypes.RawParams) error {
-	return mapstructure.Decode(rawParams, w)
+	// Have to use json because volume plan use customize marshal
+	body, err := json.Marshal(rawParams)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(body, w)
 }
 
 // WorkloadResourceRequest .
