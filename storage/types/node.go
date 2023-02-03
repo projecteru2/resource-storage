@@ -91,13 +91,11 @@ func (n *NodeResourceInfo) Validate() error {
 		return n.Capacity.Disks[i].Device < n.Capacity.Disks[j].Device
 	})
 
-	if err := n.validateVolume(); err != nil {
-		return err
-	}
-	if err := n.validateStorage(); err != nil {
-		return err
-	}
-	return n.validateDisks()
+	return errors.CombineErrors(
+		errors.CombineErrors(
+			n.validateVolume(),
+			n.validateStorage()),
+		n.validateDisks())
 }
 
 // GetAvailableResource .
