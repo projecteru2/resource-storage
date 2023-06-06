@@ -9,7 +9,7 @@ import (
 )
 
 // GetMetricsDescription .
-func (p Plugin) GetMetricsDescription(ctx context.Context) ([]resourcetypes.RawParams, error) {
+func (p Plugin) GetMetricsDescription(_ context.Context) ([]resourcetypes.RawParams, error) {
 	return []resourcetypes.RawParams{
 		{
 			"name":   "storage_used",
