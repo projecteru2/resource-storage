@@ -222,7 +222,7 @@ func (p Plugin) SetNodeResourceUsage(ctx context.Context, nodename string, resou
 	}, nil
 }
 
-func (p Plugin) GetMostIdleNode(ctx context.Context, nodenames []string) (*resourcetypes.RawParams, error) {
+func (p Plugin) GetMostIdleNode(_ context.Context, nodenames []string) (*resourcetypes.RawParams, error) {
 	nodename := nodenames[0]
 	return &resourcetypes.RawParams{
 		"nodename": nodename,
