@@ -36,9 +36,25 @@ func (p Plugin) AddNode(ctx context.Context, nodename string, resource plugintyp
 		return nil, err
 	}
 
-	// set default value
-	if info != nil && req.Storage == 0 {
-		req.Storage = info.StorageTotal * rate / 10
+	// extract resource from engine info
+	if info != nil { //nolint
+		var nodeRes storagetypes.NodeResource
+		if b, ok := info.Resources[p.name]; ok {
+			if err := json.Unmarshal(b, &nodeRes); err != nil {
+				return nil, err
+			}
+		}
+		info.StorageTotal = nodeRes.Storage
+
+		if req.Storage == 0 {
+			req.Storage = info.StorageTotal * rate / 10
+		}
+		if len(req.Volumes) == 0 {
+			req.Volumes = nodeRes.Volumes
+		}
+		if len(req.Disks) == 0 {
+			req.Disks = nodeRes.Disks
+		}
 	}
 
 	nodeResourceInfo := &storagetypes.NodeResourceInfo{
